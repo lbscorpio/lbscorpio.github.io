@@ -1,0 +1,2066 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ptf,spectrum protect,tsm,hsm,mmimgbackup," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Some GPFS command like mmimgbackup will call HSM command dsmc, so we should setup a TSM environment for some PTF testing.">
+<meta name="keywords" content="ptf, spectrum protect, tsm, hsm, mmimgbackup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to setup a TSM environment">
+<meta property="og:url" content="http://localhost:4000/setup/2021/01/02/How-to-setup-TSM-environment/">
+<meta property="og:site_name" content="Bob's Notes">
+<meta property="og:description" content="Some GPFS command like mmimgbackup will call HSM command dsmc, so we should setup a TSM environment for some PTF testing.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How to setup a TSM environment">
+<meta name="twitter:description" content="Some GPFS command like mmimgbackup will call HSM command dsmc, so we should setup a TSM environment for some PTF testing.">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>How to setup a TSM environment | Bob's Notes</title>
+  
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1QFM7HZ0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J1QFM7HZ0P');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Bob's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/setup/2021/01/02/How-to-setup-TSM-environment/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bo Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/Bob.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bob's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            How to setup a TSM environment
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-01-02T22:51:20+08:00">
+                2021-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/Setup" itemprop="url" rel="index">
+                    <span itemprop="name">Setup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+  <p>Some GPFS command like mmimgbackup will call HSM command dsmc, so we should setup a TSM environment for some PTF testing.</p>
+
+<p>This article is to deploy Spectrum Protect 8.1.11 using Single-site disk solution on an x86_64 Linux server.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Download the specific install package from it2n01:/u/tsm or <a href="https://g03zcdwas001.ahe.boulder.ibm.com/software/xl/download/ticket.wss" target="_blank">Internal DSW portal</a></li>
+  <li>A node with enough free disks/space, can refer <a href="https://www.ibm.com/support/knowledgecenter/SSEQVQ_8.1.11/srv.solutions/r_ssdisk_worksheet.html" target="_blank">the planning worksheets for preconfiguration</a> to prepare the space.</li>
+  <li>The node have installed GUI, can remote access GUI via VNC if can’t physical access.</li>
+  <li>The node have installed the required software, refer to <a href="https://www.ibm.com/support/knowledgecenter/SSEQVQ_8.1.11/srv.solutions/r_ssdisk_sysreqs_software.html" target="_blank">Software requirements</a> for more information.</li>
+</ul>
+
+<h2 id="steps-to-installconfigure-tsm-server">Steps to install/configure TSM server</h2>
+
+<h3 id="create-user-and-group-id-for-the-tsm-server-instance">Create user and group id for the TSM server instance</h3>
+
+<ul>
+  <li>
+    <p>Run below commands to create user <code class="language-plaintext highlighter-rouge">tsminst1</code> and its group</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># groupadd tsmsrvrs -g 500
+# useradd -d /home/tsminst1 -m -u 500 -g 500 -s /bin/bash tsminst1
+# passwd tsminst1    # ppslab
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="extract-and-run-the-tsm-installer-tool">Extract and run the TSM installer tool</h3>
+
+<ul>
+  <li>
+    <p>Extract the downloaded binary file</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># chmod +x SP_8.1.11_LIN86_SERSTG_AGT_ML.bin
+# ./SP_8.1.11_LIN86_SERSTG_AGT_ML.bin
+  inflating: repository/plugins/com.tivoli.dsm.stagent.moreinfo_8.1.11.202011031146.jar
+  inflating: repository/repository.config
+  inflating: repository/repository.xml
+   creating: .input/
+  inflating: .input/installnew32.xml
+  inflating: .input/installnew64.xml
+  inflating: .input/install_response.xml
+   creating: input/
+  inflating: input/install_response_sample.xml
+  inflating: input/uninstall_response_sample.xml
+  inflating: input/update_response_sample.xml
+  inflating: im32/post-install.xml
+  inflating: im64/post-install.xml
+  inflating: README.htm
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Run the TSM installer tool</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ./install.sh
+GUI failed to start. For more information see /tmp/install.569.log.
+Launching console mode...
+Preprocessing the input.
+Loading repositories...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+Preparing and resolving the selected packages...
+  
+  
+=====&gt; IBM Installation Manager&gt; Install
+  
+Select packages to install:
+     1. [X] IBM® Installation Manager 1.9.1.3
+     2. [X] IBM Spectrum Protect server 8.1.11.20201103_1152
+     3. [X] IBM Spectrum Protect languages 8.1.11.20201103_1149
+     4. [X] IBM Spectrum Protect license 8.1.11.20201103_1148
+     5. [X] IBM Spectrum Protect storage agent 8.1.11.20201103_1147
+     6. [X] IBM Spectrum Protect device driver  8.1.11.20201103_1150
+     7. [X] IBM Spectrum Protect Operations Center 8.1.11000.20200930_0721
+  
+     O. Check for Other Versions, Fixes, and Extensions
+  
+     N. Next,      C. Cancel
+-----&gt; [N]
+Validating package prerequisites...
+......
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses
+  
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Installation Manager - License Agreement
+  
+Options:
+     A. [ ] I accept the terms in the license agreement
+     D. [ ] I do not accept the terms in the license agreement
+  
+     B. Back,      C. Cancel
+-----&gt; [C] A
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses
+  
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Installation Manager - License Agreement
+  
+Options:
+     A. [X] I accept the terms in the license agreement
+     D. [ ] I do not accept the terms in the license agreement
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N]
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory
+  
+Installation Manager installation location:
+        /opt/IBM/InstallationManager/eclipse
+  
+Shared Resources Directory:
+        /opt/IBM/IBMIMShared
+  
+Options:
+     L. Change Installation Manager Installation Location
+     M. Change Shared Resources Directory
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N]
+Finding compatible package groups...
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt; Location
+  
+New package group:
+     1. [X] IBM Spectrum Protect
+  
+Selected group id: "IBM Spectrum Protect"
+Selected location: "/opt/tivoli/tsm"
+Selected architecture: 64-bit
+  
+Options:
+     M. Change Location
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N]
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features
+  
+IBM® Installation Manager
+  
+IBM Spectrum Protect server
+  
+IBM Spectrum Protect languages
+     1. [ ] Spanish
+     2. [ ] Portuguese
+     3. [ ] German
+     4. [ ] French
+     5. [ ] Italian
+     6. [ ] Russian
+     7. [ ] Japanese
+     8. [ ] Korean
+     9. [ ] Traditional Chinese
+    10. [ ] Simplified Chinese
+  
+IBM Spectrum Protect license
+  
+IBM Spectrum Protect storage agent
+  
+IBM Spectrum Protect device driver
+  
+IBM Spectrum Protect Operations Center
+    11. [X] Operations Center
+  
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N] 10
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features
+  
+IBM® Installation Manager
+  
+IBM Spectrum Protect server
+  
+IBM Spectrum Protect languages
+     1. [ ] Spanish
+     2. [ ] Portuguese
+     3. [ ] German
+     4. [ ] French
+     5. [ ] Italian
+     6. [ ] Russian
+     7. [ ] Japanese
+     8. [ ] Korean
+     9. [ ] Traditional Chinese
+    10. [X] Simplified Chinese
+  
+IBM Spectrum Protect license
+  
+IBM Spectrum Protect storage agent
+  
+IBM Spectrum Protect device driver
+  
+IBM Spectrum Protect Operations Center
+    11. [X] Operations Center
+  
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N]
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels
+  
+  
+---- Configuration for IBM Spectrum Protect Operations Center 8.1.11000.20200930_0721
+  
+  
+Specify the secure communication settings - Secure (https) port
+-----&gt; [11090]
+  
+---- Create password
+  
+  
+         Password length:
+         - Minimum: 6 characters
+         - Maximum: 64 characters
+  
+         The password must contain at least:
+         - One uppercase letter (A - Z)
+         - One lowercase letter (a - z)
+         - One digit (0 - 9)
+         - Two non-alphanumeric characters: ~ # $ % ^ @ * _ - + =  | ( ) { } [ ] : ; &lt; &gt; , . ? /
+  
+Create password
+-----&gt;
+  
+Confirm password
+-----&gt;
+  
+---- Configuration for IBM Spectrum Protect server 8.1.11.20201103_1152
+  
+  
+Select the product that you purchased:
+     1. IBM Spectrum Protect
+     2. IBM Spectrum Protect Extended Edition
+     3. IBM Spectrum Protect for Data Retention
+  
+-----&gt; 1
+  
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Spectrum Protect - Software License Agreement
+     2. IBM Spectrum Protect - Non-IBM Terms
+Options:
+     A. [ ] I accept the terms in the license agreements.
+     D. [ ] I do not accept the terms in the license agreements.
+  
+-----&gt; A
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Spectrum Protect - Software License Agreement
+     2. IBM Spectrum Protect - Non-IBM Terms
+Options:
+     A. [X] I accept the terms in the license agreements.
+     D. [ ] I do not accept the terms in the license agreements.
+  
+  
+---- Configuration for IBM Spectrum Protect storage agent 8.1.11.20201103_1147
+  
+  
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Spectrum Protect for Storage Area Networks - Software License Agreement
+     2. IBM Spectrum Protect for Storage Area Networks - Non-IBM Terms
+Options:
+     A. [ ] I accept the terms in the license agreements.
+     D. [ ] I do not accept the terms in the license agreements.
+  
+-----&gt; A
+Read the following license agreements carefully.
+View a license agreement by entering the number:
+     1. IBM Spectrum Protect for Storage Area Networks - Software License Agreement
+     2. IBM Spectrum Protect for Storage Area Networks - Non-IBM Terms
+Options:
+     A. [X] I accept the terms in the license agreements.
+     D. [ ] I do not accept the terms in the license agreements.
+  
+  
+  
+     B. Back,      N. Next,      C. Cancel
+-----&gt; [N]
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels&gt; Summary
+  
+Target Location:
+  Package Group Name         :  IBM Installation Manager
+  Installation Directory     :  /opt/IBM/InstallationManager/eclipse
+  Package Group Name         :  IBM Spectrum Protect
+  Installation Directory     :  /opt/tivoli/tsm
+  Shared Resources Directory :  /opt/IBM/IBMIMShared
+  
+Translations:
+        English
+  
+Packages to be installed:
+        IBM® Installation Manager 1.9.1.3
+        IBM Spectrum Protect server 8.1.11.20201103_1152
+        IBM Spectrum Protect languages 8.1.11.20201103_1149
+        IBM Spectrum Protect license 8.1.11.20201103_1148
+        IBM Spectrum Protect storage agent 8.1.11.20201103_1147
+        IBM Spectrum Protect device driver  8.1.11.20201103_1150
+        IBM Spectrum Protect Operations Center 8.1.11000.20200930_0721
+  
+Options:
+     G. Generate an Installation Response File
+  
+     B. Back,      I. Install,      C. Cancel
+-----&gt; [I] G
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels&gt; Summary&gt; Save response file
+  
+Enter a directory path and a file name to generate the response file. Use .xml as the file extension. If a file name is specified without a full directory path, the response file is saved to /tmp/tsm. To skip the generation of a response file, press Enter.
+-----&gt; response.xml
+  
+=====&gt; IBM Installation Manager&gt; Save response file
+  
+Response file was generated successfully: response.xml
+  
+     O. OK
+-----&gt; [O]
+  
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels&gt; Summary
+  
+Target Location:
+  Package Group Name         :  IBM Installation Manager
+  Installation Directory     :  /opt/IBM/InstallationManager/eclipse
+  Package Group Name         :  IBM Spectrum Protect
+  Installation Directory     :  /opt/tivoli/tsm
+  Shared Resources Directory :  /opt/IBM/IBMIMShared
+  
+Translations:
+        English
+  
+Packages to be installed:
+        IBM® Installation Manager 1.9.1.3
+        IBM Spectrum Protect server 8.1.11.20201103_1152
+        IBM Spectrum Protect languages 8.1.11.20201103_1149
+        IBM Spectrum Protect license 8.1.11.20201103_1148
+        IBM Spectrum Protect storage agent 8.1.11.20201103_1147
+        IBM Spectrum Protect device driver  8.1.11.20201103_1150
+        IBM Spectrum Protect Operations Center 8.1.11000.20200930_0721
+  
+Options:
+     G. Generate an Installation Response File
+  
+     B. Back,      I. Install,      C. Cancel
+-----&gt; [I]
+                 25%                50%                75%                100%
+------------------|------------------|------------------|------------------|
+............................................................................
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels&gt; Summary&gt; Completion
+  
+The install completed successfully.
+  
+INFORMATION: Multiple informations are generated.
+  
+     V. View Message Details
+  
+Options:
+     F. Finish
+-----&gt; [F] V
+  
+=====&gt; IBM Installation Manager&gt; Information
+  
+Multiple informations are generated.
+  
+Details:
+To learn about best practices for configuring, monitoring, and operating an IBM Spectrum Protect solution, go to IBM Knowledge Center:   http://www.ibm.com/support/knowledgecenter/SSEQVQ/landing/welcome_sseqvq.htm   Search for IBM Spectrum Protect data protection solutions.
+  
+The IBM Spectrum Protect Operations Center is now installed.  You can access it at the following URL:
+  
+https://c550f6u13.pok.stglabs.ibm.com:11090/oc
+  
+     O. OK,      D. Hide Details
+-----&gt; [O]
+  
+=====&gt; IBM Installation Manager&gt; Install&gt; Licenses&gt; Shared Directory&gt;
+  Location&gt; Features&gt; Custom panels&gt; Summary&gt; Completion
+  
+The install completed successfully.
+  
+INFORMATION: Multiple informations are generated.
+  
+     V. View Message Details
+  
+Options:
+     F. Finish
+-----&gt; [F]
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="configure-tsm-server-instance-with-gui">Configure TSM server instance with GUI</h3>
+
+<ul>
+  <li>
+    <p>Launch IBM Spectrum Protect Instance Configuration Wizard via VNC viewer</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /opt/tivoli/tsm/server/bin/dsmicfgx
+Preparing to install
+Extracting the JRE from the installer archive...
+Unpacking the JRE...
+Extracting the installation resources from the installer archive...
+Configuring the installer for this system's environment...
+
+Launching installer...
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Specify the directories for TSM file systems in the GUI</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Instance User ID
+Instance Directory
+Database Directories
+Recovery Log Directories:
+  Active log directory
+  Primary archive log directory
+  Active log mirror directory
+  Secondary archive log directory
+
+Recovery Log Dir
+Recovery Log Archive Dir
+Recovery Log Archive Failover Dir
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="registering-licenses-and-configuring-the-tsm-server">Registering Licenses and configuring the TSM server</h2>
+
+<h3 id="registering-licenses">Registering Licenses</h3>
+
+<ul>
+  <li>
+    <p>Accessing the TSM server</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dsmadmc
+IBM Spectrum Protect
+Command Line Administrative Interface - Version 8, Release 1, Level 11.28
+(c) Copyright by IBM Corporation and other(s) 1990, 2020. All Rights Reserved.
+
+Enter your user id:  tsmadmin
+
+Enter your password:
+
+Session established with server C550F6U13: Linux/x86_64
+  Server Version 8, Release 1, Level 11.000
+  Server date/time: 12/31/2020 05:10:03  Last access: 12/31/2020 02:29:57
+  
+Protect: C550F6U13&gt;q license
+
+                                              Last License Audit: 12/31/2020 02:18:25
+                     Number of Data Protection for Oracle in use: 0
+            Number of Data Protection for Oracle in try buy mode: 0
+              Number of Data Protection for Microsoft SQL in use: 0
+     Number of Data Protection for Microsoft SQL in try buy mode: 0
+         Number of Data Protection for Microsoft Exchange in use: 0
+Number of Data Protection for Microsoft Exchange in try buy mode: 0
+                            Number of TDP for Lotus Notes in use: 0
+                   Number of TDP for Lotus Notes in try buy mode: 0
+               Number of Data Protection for Lotus Domino in use: 0
+      Number of Data Protection for Lotus Domino in try buy mode: 0
+                               Number of TDP for Informix in use: 0
+                      Number of TDP for Informix in try buy mode: 0
+                                Number of TDP for SAP R/3 in use: 0
+                       Number of TDP for SAP R/3 in try buy mode: 0
+                                    Number of TDP for ESS in use: 0
+                           Number of TDP for ESS in try buy mode: 0
+                                Number of TDP for ESS R/3 in use: 0
+                       Number of TDP for ESS R/3 in try buy mode: 0
+                          Number of TDP for EMC Symmetrix in use: 0
+                 Number of TDP for EMC Symmetrix in try buy mode: 0
+                      Number of TDP for EMC Symmetrix R/3 in use: 0
+             Number of TDP for EMC Symmetrix R/3 in try buy mode: 0
+                                    Number of TDP for WAS in use: 0
+                           Number of TDP for WAS in try buy mode: 0
+             Is IBM Spectrum Protect for Data Retention in use ?: No
+           Is IBM Spectrum Protect for Data Retention licensed ?: No
+                    Is IBM Spectrum Protect Basic Edition in use: Yes
+                  Is IBM Spectrum Protect Basic Edition licensed: No
+                 Is IBM Spectrum Protect Extended Edition in use: No
+               Is IBM Spectrum Protect Extended Edition licensed: No
+                                       Server License Compliance: FAILED
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Registering three Licenses</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;REGI LICENSE FILE=dataret.lic
+ANR2852I Current license information:
+ANR2853I New license information:
+ANR2828I Server is licensed to support IBM Spectrum Protect for Data Retention.
+     
+Protect: C550F6U13&gt;REGI LICENSE FILE=tsmbasic.lic
+ANR2852I Current license information:
+ANR2828I Server is licensed to support IBM Spectrum Protect for Data Retention.
+ANR2853I New license information:
+ANR2828I Server is licensed to support IBM Spectrum Protect for Data Retention.
+ANR2828I Server is licensed to support IBM Spectrum Protect Basic Edition.
+     
+Protect: C550F6U13&gt;REGI LICENSE FILE=tsmee.lic
+ANR2852I Current license information:
+ANR2828I Server is licensed to support IBM Spectrum Protect for Data Retention.
+ANR2828I Server is licensed to support IBM Spectrum Protect Basic Edition.
+ANR2853I New license information:
+ANR2828I Server is licensed to support IBM Spectrum Protect for Data Retention.
+ANR2828I Server is licensed to support IBM Spectrum Protect Basic Edition.
+ANR2828I Server is licensed to support IBM Spectrum Protect Extended Edition.
+     
+Protect: C550F6U13&gt;q license
+     
+                                              Last License Audit: 12/31/2020 02:18:25
+                     Number of Data Protection for Oracle in use: 0
+            Number of Data Protection for Oracle in try buy mode: 0
+              Number of Data Protection for Microsoft SQL in use: 0
+     Number of Data Protection for Microsoft SQL in try buy mode: 0
+         Number of Data Protection for Microsoft Exchange in use: 0
+Number of Data Protection for Microsoft Exchange in try buy mode: 0
+                            Number of TDP for Lotus Notes in use: 0
+                   Number of TDP for Lotus Notes in try buy mode: 0
+               Number of Data Protection for Lotus Domino in use: 0
+      Number of Data Protection for Lotus Domino in try buy mode: 0
+                               Number of TDP for Informix in use: 0
+                      Number of TDP for Informix in try buy mode: 0
+                                Number of TDP for SAP R/3 in use: 0
+                       Number of TDP for SAP R/3 in try buy mode: 0
+                                    Number of TDP for ESS in use: 0
+                           Number of TDP for ESS in try buy mode: 0
+                                Number of TDP for ESS R/3 in use: 0
+                       Number of TDP for ESS R/3 in try buy mode: 0
+                          Number of TDP for EMC Symmetrix in use: 0
+                 Number of TDP for EMC Symmetrix in try buy mode: 0
+                      Number of TDP for EMC Symmetrix R/3 in use: 0
+             Number of TDP for EMC Symmetrix R/3 in try buy mode: 0
+                                    Number of TDP for WAS in use: 0
+                           Number of TDP for WAS in try buy mode: 0
+             Is IBM Spectrum Protect for Data Retention in use ?: No
+           Is IBM Spectrum Protect for Data Retention licensed ?: Yes
+                    Is IBM Spectrum Protect Basic Edition in use: Yes
+                  Is IBM Spectrum Protect Basic Edition licensed: Yes
+                 Is IBM Spectrum Protect Extended Edition in use: No
+               Is IBM Spectrum Protect Extended Edition licensed: Yes
+                                       Server License Compliance: Valid
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="update-node-parameters-for-gpfs-and-add-space-for-the-tsm-database">Update node parameters for GPFS and add space for the TSM database</h3>
+
+<ul>
+  <li>
+    <p>Update node parameters for GPFS</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;update node C550F6U28 PASSExp=0 MAXNUMMP=256 TXNGroupmax=32767
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Add space for the TSM database if needed</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;define vol backuppool /tsm/TSMfile02/bakfile numberofvolumes=46 formatsize=10000
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="configure-the-tsm-servers-policy">Configure the TSM server’s policy</h3>
+
+<ul>
+  <li>
+    <p>Check policy</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;q mgmt f=d
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: ACTIVE
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: None
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: Yes
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): SERVER_CONSOLE
+         Last Update Date/Time: 12/31/2020 02:06:43
+              Managing profile:
+               Changes Pending: No
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: STANDARD
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: None
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: Yes
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): SERVER_CONSOLE
+more...   (&lt;ENTER&gt; to continue, 'C' to cancel)
+    
+         Last Update Date/Time: 12/31/2020 02:06:43
+              Managing profile:
+               Changes Pending: No
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Update policy</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;update mgmt standard standard standard SPACEMGTECHnique=AUTO MIGREQUIRESBKUP=no
+ANR1522I Management class STANDARD updated in policy domain STANDARD, set STANDARD.
+    
+Protect: C550F6U13&gt;q mgmt f=d
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: ACTIVE
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: None
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: Yes
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): SERVER_CONSOLE
+         Last Update Date/Time: 12/31/2020 02:06:43
+              Managing profile:
+               Changes Pending: No
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: STANDARD
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: Automatic
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: No
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): TSMADMIN
+more...   (&lt;ENTER&gt; to continue, 'C' to cancel)
+    
+         Last Update Date/Time: 12/31/2020 09:36:40
+              Managing profile:
+               Changes Pending: Yes
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Activate policy</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Protect: C550F6U13&gt;activate pol STANDARD STANDARD
+    
+Do you wish to proceed? (Yes (Y)/No (N)) Y
+ANR1514I Policy set STANDARD activated in policy domain STANDARD.
+    
+Protect: C550F6U13&gt;q mgmt f=d
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: ACTIVE
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: Automatic
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: No
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): TSMADMIN
+         Last Update Date/Time: 12/31/2020 09:36:40
+              Managing profile:
+               Changes Pending: No
+    
+            Policy Domain Name: STANDARD
+               Policy Set Name: STANDARD
+               Mgmt Class Name: STANDARD
+          Default Mgmt Class ?: Yes
+                   Description: Installed default management class.
+    Space Management Technique: Automatic
+       Auto-Migrate on Non-Use: 0
+    Migration Requires Backup?: No
+         Migration Destination: SPACEMGPOOL
+Last Update by (administrator): TSMADMIN
+more...   (&lt;ENTER&gt; to continue, 'C' to cancel)
+    
+         Last Update Date/Time: 12/31/2020 09:36:40
+              Managing profile:
+               Changes Pending: No
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="steps-to-installconfigure-tsm-client">Steps to install/configure TSM client</h2>
+
+<ol>
+  <li>
+    <p>Locate the specific version from it2n01:/u/tsm/tsm.client, find the relevant packages.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>For X86 node:
+# ls /u/tsm/tsm.client/8.1.11/X86/HSM/*.rpm
+gskcrypt64-8.0.55.17.linux.x86_64.rpm  TIVsm-API64.x86_64.rpm   TIVsm-BAcit.x86_64.rpm  TIVsm-HSM.x86_64.rpm
+gskssl64-8.0.55.17.linux.x86_64.rpm    TIVsm-APIcit.x86_64.rpm  TIVsm-BA.x86_64.rpm     TIVsm-WEBGUI.x86_64.rpm
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Install all above packages except TIVsm-WEBGUI (optional), with <strong>SCOUTFREE</strong> mode.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Examples for X86 node:
+# cd /u/tsm/tsm.client/8.1.11/X86/HSM/
+# export HSMINSTALLMODE=SCOUTFREE
+# rpm -ivh gsk*.rpm TIVsm-API*.rpm TIVsm-BA*.rpm TIVsm-HSM*.rpm
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Login the Spectrum Protect Operations Center GUI(https://<TSM_server>:11090/oc/), add the client if needed.</TSM_server></p>
+  </li>
+  <li>
+    <p>Configure dsm.opt and dsm.sys files(under <em>/opt/tivoli/tsm/client/ba/bin</em>) on your environment.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Examples:
+# cat /opt/tivoli/tsm/client/ba/bin/dsm.sys
+SErvername  tsms_c550f6u13
+   COMMMethod         TCPip
+   TCPPort            1500
+   TCPServeraddress   c550f6u13.pok.stglabs.ibm.com
+   NODENAME           C550F5U28
+   passwordaccess     generate
+   errorlogname       /opt/tivoli/tsm/client/ba/bin/dsmerror.log
+   errorlogretention  5 d
+   HSMLOGNAME         /tmp/hsm/hsm.log
+   HSMLOGEVENTFLAGS   FILE
+   SSL                YES
+   
+# cat /opt/tivoli/tsm/client/ba/bin/dsm.opt
+HSMENABLEIMMEDIATEMIGRATE YES
+HSMDISABLEAUTOMIGDAEMONS  yes
+HSMGROUPEDMIGRATE YES
+HSMEXTOBJIDATTR YES
+clusternode yes
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Import the TSM server certificate for SSL</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dsmcert -add -server &lt;TSM_server&gt; -file &lt;path_of_cert256.arm&gt;
+   
+Example:
+# dsmcert -add -server c550f6u13 -file ~/cert256.arm
+IBM Spectrum Protect
+dsmcert utility
+  dsmcert Version 8, Release 1, Level 11.28 20200928A
+  dsmcert date/time: 12/31/2020 22:28:48
+ (c) Copyright by IBM Corporation and other(s) 1990, 2020. All Rights Reserved.
+
+Result : Success
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Start the service then add the file system for testing</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dsmmigfs start
+# dsmmigfs Add &lt;file_system&gt;
+    
+Example:
+# dsmmigfs Add /gpfs/fs1
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>If you want to delete the node which installed TSM client, might need to delete TSM client packages firstly.</p>
+  </li>
+</ol>
+
+<h2 id="run-backup-testing-from-client-node">Run Backup testing from client node</h2>
+
+<ul>
+  <li>
+    <p>Perform backup testing from client(for example c550f6u28 here)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@c550f6u28 ~]# mmimgbackup fs1 -S snap1
+mmimgbackup: [I] Image backup of /dev/fs1 begins at Thu Dec 31 22:31:03 EST 2020.
+[I] GPFS Current Data Pool Utilization in KB and %
+Pool_Name          	    KB_Occupied	       KB_Total	 Percent_Occupied
+system              	        1646592	      975585280	     0.168779914%
+[I] 131129 of 268224 inodes used: 48.887870%.
+[I] Loaded policy rules from /fs1/.imgbackup/imgbackup_1229/.imagePolicy.
+Evaluating policy rules with CURRENT_TIMESTAMP = 2021-01-01@03:31:03 UTC
+Parsed 2 policy rules.
+/* Automatically generated policy file for image backup */
+RULE 'xl-d'  EXTERNAL LIST xl EXEC ''
+RULE 'xl-m'  LIST xl directories_plus
+     
+[I] 2021-01-01@03:31:03.945 Directory entries scanned: 127075.
+[I] Directories scan: 127052 files, 23 directories, 0 other objects, 0 'skipped' files and/or errors.
+[I] 2021-01-01@03:31:04.055 Sorting 127075 file list records.
+[I] Source: fs "fs1" snap "snap1" path "/fs1/.snapshots/snap1".  \.......
+[I] Inodes scan: 127052 files, 23 directories, 0 other objects, 0 'skipped' files and/or errors.
+[I] 2021-01-01@03:31:12.147 Policy evaluation. 127075 files scanned.
+[I] The image file writer terminated with ec:0
+[I] Summary: 127075 inodes scanned, 127075 records written, 0 n/a, 0 errors.
+mmimgbackup: [I] Image backup of /dev/fs1 ends at Thu Dec 31 22:31:12 EST 2020.
+IBM Spectrum Protect
+Command Line Backup-Archive Client Interface
+  Client Version 8, Release 1, Level 11.28 20200928A
+  Client date/time: 12/31/2020 22:31:12
+(c) Copyright by IBM Corporation and other(s) 1990, 2020. All Rights Reserved.
+     
+Node Name: C550F6U28
+Please enter your user id &lt;C550F6U28&gt;: tsmadmin
+     
+Please enter password for user id "TSMADMIN":
+     
+Session established with server C550F6U13: Linux/x86_64
+  Server Version 8, Release 1, Level 11.000
+  Server date/time: 12/31/2020 22:31:13  Last access: 12/31/2020 22:22:54
+     
+Selective Backup function invoked.
+     
+Directory--&gt;               4,096 /fs1/.imgbackup/imgbackup_1229 [Sent]
+Directory--&gt;               4,096 /fs1/.imgbackup [Sent]
+Directory--&gt;               4,096 /fs1/.imgbackup/imgbackup_1229/mmPolicy.1312.6E0AE049 [Sent]
+Normal File--&gt;               136 /fs1/.imgbackup/imgbackup_1229/.imagePolicy [Sent]
+Normal File--&gt;        44,805,896 /fs1/.imgbackup/imgbackup_1229/mmPolicy.1312.6E0AE049/ImageArchive_20210101_03.31.03_000.sbr [Sent]
+Normal File--&gt;             1,088 /fs1/.imgbackup/imgbackup_1229/mmPolicy.1312.6E0AE049/ImageArchive_20210101_03.31.03.idx [Sent]
+Selective Backup processing of '/fs1/.imgbackup/imgbackup_1229/*' finished without failure.
+     
+     
+Total number of objects inspected:            6
+Total number of objects backed up:            6
+Total number of objects updated:              0
+Total number of objects rebound:              0
+Total number of objects deleted:              0
+Total number of objects expired:              0
+Total number of objects failed:               0
+Total number of objects encrypted:            0
+Total number of objects grew:                 0
+Total number of retries:                      0
+Total number of bytes inspected:          42.74 MB
+Total number of bytes transferred:        42.73 MB
+Data transfer time:                        0.60 sec
+Network data transfer rate:           72,190.58 KB/sec
+Aggregate data transfer rate:         41,586.12 KB/sec
+Objects compressed by:                        0%
+Total data reduction ratio:                0.03%
+Elapsed processing time:               00:00:01
+mmimgbackup: Successful backup up image files from directory /fs1/.imgbackup/imgbackup_1229.
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<p><a href="https://www.ibm.com/support/knowledgecenter/SSEQVQ" target="_blank">IBM Spectrum Protect</a> from Knowledge Center<br />
+<a href="https://tuna.pok.stglabs.ibm.com/wiki/Installing_and_configuring_TSM_server" target="_blank">Installing and configuring TSM server</a> from GpfsWiki<br />
+<a href="https://www.ibm.com/support/pages/ibm-spectrum-protect-blueprints" target="_blank">IBM Spectrum Protect Blueprints</a><br />
+<a href="https://www.ibm.com/support/pages/node/84861" target="_blank">Overview - IBM Spectrum Protect Supported Operating Systems</a><br />
+<a href="https://www.ibm.com/support/pages/system/files/inline-files/IBM_Spectrum_Protect_HSM_Scale_Configuration_Guide.pdf" target="_blank">Deploying a Solution that Combines IBM Spectrum Protect for Space Management with IBM Spectrum Scale</a></p>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/ptf" rel="tag"># ptf</a>
+          
+            
+            <a href="/tag/#/spectrum%20protect" rel="tag"># spectrum protect</a>
+          
+            
+            <a href="/tag/#/tsm" rel="tag"># tsm</a>
+          
+            
+            <a href="/tag/#/hsm" rel="tag"># hsm</a>
+          
+            
+            <a href="/tag/#/mmimgbackup" rel="tag"># mmimgbackup</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/setup/2021/01/05/How-to-configure-NFS-Ganesha/" rel="next" title="How to configure NFS-Ganesha without a CES IP">
+                <i class="fa fa-chevron-left"></i> How to configure NFS-Ganesha without a CES IP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/procedure/2020/12/31/How-to-install-VNCserver-on-RHEL/" rel="prev" title="How to install VNC Server on RHEL 7.x">
+                How to install VNC Server on RHEL 7.x <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/Bob.jpg"
+               alt="Bo Liu" />
+          <p class="site-author-name" itemprop="name">Bo Liu</p>
+           
+              <p class="site-description motion-element" itemprop="description">Memo on my positions on blue journey</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.ibm.com/lbosh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#prerequisites"> <span class="nav-number">1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#steps-to-installconfigure-tsm-server"> <span class="nav-number">2</span> <span class="nav-text">Steps to install/configure TSM server</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#create-user-and-group-id-for-the-tsm-server-instance"> <span class="nav-number">2.1</span> <span class="nav-text">Create user and group id for the TSM server instance</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#extract-and-run-the-tsm-installer-tool"> <span class="nav-number">2.2</span> <span class="nav-text">Extract and run the TSM installer tool</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#configure-tsm-server-instance-with-gui"> <span class="nav-number">2.3</span> <span class="nav-text">Configure TSM server instance with GUI</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#registering-licenses-and-configuring-the-tsm-server"> <span class="nav-number">3</span> <span class="nav-text">Registering Licenses and configuring the TSM server</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#registering-licenses"> <span class="nav-number">3.1</span> <span class="nav-text">Registering Licenses</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#update-node-parameters-for-gpfs-and-add-space-for-the-tsm-database"> <span class="nav-number">3.2</span> <span class="nav-text">Update node parameters for GPFS and add space for the TSM database</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#configure-the-tsm-servers-policy"> <span class="nav-number">3.3</span> <span class="nav-text">Configure the TSM server’s policy</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#steps-to-installconfigure-tsm-client"> <span class="nav-number">4</span> <span class="nav-text">Steps to install/configure TSM client</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#run-backup-testing-from-client-node"> <span class="nav-number">5</span> <span class="nav-text">Run Backup testing from client node</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#references"> <span class="nav-number">6</span> <span class="nav-text">References</span> </a> </li>
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy;  2020 - 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo Liu</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+

@@ -1,0 +1,1635 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ptf,gpfs,gpfstest,regression," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="There are some regression testing on a PTF build, I collected some of them here, which I was doing so far. It is not a full list but limited, just for your reference.">
+<meta name="keywords" content="ptf, gpfs, gpfstest, regression">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Steps to run regression tests on a PTF build">
+<meta property="og:url" content="http://localhost:4000/test/2021/01/16/Run-regressiontest-on-PTF-build/">
+<meta property="og:site_name" content="Bob's Notes">
+<meta property="og:description" content="There are some regression testing on a PTF build, I collected some of them here, which I was doing so far. It is not a full list but limited, just for your reference.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Steps to run regression tests on a PTF build">
+<meta name="twitter:description" content="There are some regression testing on a PTF build, I collected some of them here, which I was doing so far. It is not a full list but limited, just for your reference.">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>Steps to run regression tests on a PTF build | Bob's Notes</title>
+  
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1QFM7HZ0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J1QFM7HZ0P');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Bob's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/test/2021/01/16/Run-regressiontest-on-PTF-build/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bo Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/Bob.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bob's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            Steps to run regression tests on a PTF build
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-01-16T01:53:20+08:00">
+                2021-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/Test" itemprop="url" rel="index">
+                    <span itemprop="name">Test</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+  <p>There are some regression testing on a PTF build, I collected some of them here, which I was doing so far. It is not a full list but limited, just for your reference.</p>
+
+<h2 id="filesystem-core-regression">Filesystem Core Regression</h2>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+  <li>An existing GPFS cluster with a PTF build, and have one filesystem mounted.</li>
+  <li>The testing filesystem must be created with 4 disks(NSD), due to some script need at least 3 disks in the system pool. And one step will remove one disk for testing in the middle of the testing.</li>
+  <li>Mount <em>it2n01:/u/gpfstest</em> on all testing nodes, ensure the variable PATH added the path <em>/u/gpfstest/bin</em> too.</li>
+  <li>Define a file /nodes with specific nodes name which will be used, and they should have installed <strong>python3</strong>. If the OS is AIX, ensure a symbolic link <em>/usr/bin/python3</em> linked to the real python3 executable file.</li>
+</ul>
+
+<h3 id="steps-to-run-the-regression-test">Steps to run the regression test</h3>
+
+<ol>
+  <li>
+    <p>Depend on what kinds of testing what you will run(e.g. gerontion or quota testing), you might add users on all nodes firstly.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /u/gpfstest/config/OS/userAdd --numUser 256 -u 94613 -g 100 -p pfs --fvt
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>This command will run hours in my testing, can do it on a screen session.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run the test command, it will call sub-scripts.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Example:
+# nohup /u/gpfstest/bin/regressiontest --no -F fs1 -x --startstress="/u/gpfstest/bin/gerontion -N /nodes -F fs1 --ea --acl --dio --aio --vio --compress ioMixer cacheFiller aclStress" --stopstress="/u/gpfstest/bin/gerontion_killer ioMixer cacheFiller aclStress" &gt;&gt; ~/regressiontest-fs1-15Jan.log &amp;
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>Above command run testing against file system fs1 and redirect the output to log file regressiontest-fs1-15Jan.log</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h2 id="mmbackup-and-hsm-regression">mmbackup and HSM Regression</h2>
+
+<h3 id="prerequisites-1">Prerequisites</h3>
+
+<ul>
+  <li>One existing TSM server and one or two TSM clients (HSM node)</li>
+  <li>An existing GPFS cluster with a PTF build, and have one filesystem mounted.</li>
+  <li>The testing filesystem must enable DMAPI function</li>
+  <li>Mount it2n01:/u/gpfstest on all testing nodes</li>
+  <li>You might need two HSM nodes for some test case</li>
+</ul>
+
+<h3 id="steps-to-run-the-regression-test-1">Steps to run the regression test</h3>
+
+<ol>
+  <li>
+    <p>Start DMAPI related service firstly if not yet</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dsmmigfs start
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Enable DMAPI function on the testing filesystem</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># mmumount &lt;filesystem&gt; -a
+# mmchfs &lt;filesystem&gt; -z yes        // Enable DMAPI function on the specific file system
+# mmmount &lt;filesystem&gt; -a
+   
+Examples:
+# mmumount fs1 -a
+# mmchfs fs1 -z yes
+# mmmount fs1 -a
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Add HSM support for the filesystem firstly</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dsmmigfs Add /gpfs/fs1
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>I hit the error <a href="https://www.ibm.com/support/knowledgecenter/it/SSEQVQ_8.1.0/client.msgs/ANS9543W.html" target="_blank">ANS9543W</a> once due to the file system issue, it is ok after re-mounting it.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run mmbackup regression test</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Example:
+# /u/gpfstest/regression/backup_archive/TSM/mmbackupreg.pl -f fs1 -N &lt;worker_node&gt; -l /log/mmbackup -m 2 -v 1,3,4,5,6,7,8,9,10
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>The test case2 will be failed always, so bypass here.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run HSM regression test</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Example:
+# /u/gpfstest/regression/backup_archive/TSM/hsmreg.pl -f fs1 -l /log/mmbackup    // Run all cases
+# /u/gpfstest/regression/backup_archive/TSM/hsmreg.pl -f fs1 -l /log/mmbackup -v 8 -t 900
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>The test case5 need two HSM nodes, and have better to add custom timeout(e.g. -t 900) for the test case8.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h2 id="multicluster-and-ciperlist-rotation-regression">Multicluster and Ciperlist rotation Regression</h2>
+
+<h3 id="prerequisites-2">Prerequisites</h3>
+
+<ul>
+  <li>Two existing GPFS clusters with a PTF build</li>
+  <li>The client cluster(clusterB) mount a remote GPFS filesystem of server cluster(clusterA), the I/O will be ran on the mounted file system. You can refer to <a href="https://pages.github.ibm.com/lbosh/myblog/setup/2021/01/10/How-to-setup-multicluster/" target="_blank">this article</a> to setup a multicluster environment.</li>
+  <li>Have better not to start filesystem core regression test at the same time, because it might shutdown the NSD node if it is also configured for the remote file system in your environment.</li>
+</ul>
+
+<h3 id="steps-to-run-the-regression-test-2">Steps to run the regression test</h3>
+
+<ol>
+  <li>
+    <p>Run I/O on the mounted remote file system, such as blast or vdbench and so on.</p>
+  </li>
+  <li>
+    <p>Update a different security level on the server cluster(clusterA) during I/Os running, the existing I/O should not be interrupted.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># mmauth show ciphers                         // To find a list of supported ciphers
+# mmauth update &lt;clusterB&gt; -l AES128-SHA      // Assuming previous security level was AUTHONLY 
+# mmauth update &lt;clusterB&gt; -l AES256-SHA256
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li>
+    <p>The help output of regressiontest</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /u/gpfstest/bin/regressiontest -h
+Command issued was /u/gpfstest/bin/regressiontest -h
+  
+Great, GPFS is installed. Continuing.
+Daemon is at 2305 but cluster is at 2301. Do not run mmchfs -V full
+  
+Usage: regressiontest -f filesystem [-d firstDisk] [-s secondDisk] [-t thirdDisk|NONE]
+    [-n nodeName] [-M] [-x] [-l numberOfLoops] [-p pauseBetweenCommands] [-m pauseForMount]
+    [--startstress="scriptToStartStress"] [--stopstress="scriptToKillStress"]
+    [--gerontionCommands=commaSeparatedList] [--gerontionFlags="flags"]
+    [-w WinDriveLetter] [--nosnapshots] [--nofilesets] [--norecovery] [--noclones]
+    [--nosobar] [--tokencheck] [--mmcrfs-undoc] [--snc] [--forcediffblocksizes] [--no]
+    [--skipsmallfs] [--runonlysmallfs] [--norestorefs] [--tracescope] [--mmdefragfs] [--longUsage|--help]
+    [--bypassfsckprompt] [--4kdisk] [--express] [--skipquotas] [--time] [--skipnetverify]
+  
+If -d, -s or -t are not specified random disks in the file system will be chosen at the
+    beginning of each loop.
+If -t NONE is specified then a third disk will not be used (old school regressiontest).
+If -n is not specified then a random node in the cluster is chosen at the beginning of each loop.
+If --norecovery is specified then recovery type tests will NOT run (ie mmshutdown, mmexpelnode).
+If --nosnapshots is specified then snapshot tests will NOT run.
+If --norestorefs is specified then mmrestorefs and checksums will be run.
+If --noclones is specified then clone related tests will NOT run.
+If --nofilesets is specified then fileset tests will NOT run.
+If --nosobar is specified then mmimgbackup and mmimgrestore, sobar tests, will NOT run.
+If --no is specified then do not prompt after a failure (old school regressiontest).
+If --mmcrfs-undoc is specified then some undocumented mmcrfs options will be run in addition.
+   These options are -i and --dir-block-size.
+If --snc is specified then all the snc flags on mmcrfs will be utilized.
+If --skipquotas is provided then we omit quota commands
+If --skipsmallfs is used then the creation and munipulation of the small 1 disk file system
+   will be skipped. This is useful for testing SNC (and others) since the small file
+   has nothing to do with SNC.
+If --runonlysmallfs is used then the creation and munipulation of the small 1 disk file system
+   will be run and nothing else. This will be done for only one iteration
+printlongusage: ./regressiontest[1916]: it's: not found
+--forcediffblocksizes is used to run with different data and metadata block sizes in newly
+   created small filesystem.
+If --tokencheck is specified then each time a return code is checked, gpfs will run a
+   diagnostic, tsfsctl fsname --token-check, to make sure tokens are in a good state.
+The default for -l is 100. If 0 given then skips down to bottom.
+-p is the number of seconds between commands. On a stressed system this should not be
+   too low. Default is 25 seconds.
+-m is the number of seconds to wait for the mount/unmount commands to finish. Default is 60 seconds.
+-w is the Windows drive letter for the temporary file system. Default is G.
+--time adds the "time" command to all commands.
+-M gathers selected commands on linux to aid in memory leak detection. Find in /log/$date.
+-x says to run offline mmfsck after major commands. Either no stress can be running or
+   use --startstress and --stopstress.
+--startstress is used in concert with --stopstress. It needs to be a command in quotes or a
+   file/program that starts stress at the beginning of each loop or after the unmount for mmfsck.
+   Be aware that the equal sign (=) is required.
+--stopstress is used in concert with --startstress. It needs to be a command in quotes or a
+   file/program that kills or stops the stress started with --startstress.
+   Be aware that the equal sign (=) is required.
+Instead of using startstress/stopstress, you can use the --gerontionCommands and --gerontionFlags
+   flags to specify the gerontion commands and flags to use. Note that --startstress and stopstress is
+   incompatible with --gerontionCommands and --gerontionFlags
+--tracescope is used for the mmdsh mmtrace command. It is the scope of that command. It is
+   useful to specify a value so that traces are cut for multicluster problems. The default
+   is "all".
+--mmdefragfs is used to run mmdefragfs after populateFS to make full block available.
+   it is useful for the small file system with a small size of disk.
+--bypassfsckprompt is used to pass -xb option to the mmfsck call.
+   Useful if you are hitting questions during mmfsck related to the environment setup.
+--4kdisk is used to test GPFS 4k-aligned file system
+--express is used to test GPFS Express Edition installs.
+--noxa is used to ignore the -xa flag. It is on by default.
+   All extended features like - ILM, AFM, CNFS tests will be automatically disabled.
+  
+  
+Examples:
+1. regressiontest -f fs1
+   Runs regressiontest against fs1. Disks and node are chosen randomly at the beginning of
+   each loop and runs forever.
+  
+1a regressiontest -f fs1 --gerontionCommands tortdir,ioMixer --gerontionFlags="--mmap --dio"
+   Runs regressiontest against fs1 and handles gerontion IO automatically
+  
+2. regressiontest -f fs1 -d gpfs1nsd -s gpfs2nsd -n c154n01 --norecovery
+   Runs command regression using disks gpfs1nsd and gpfs2nsd and c154n01 in all loops.
+   No randomness. No recovery commands will run meaning stress will stay running on c154n01.
+  
+3. regressiontest -f fs1 -x --startstress="/u/gpfstest/bin/gerontion -N /nodes -F fs1 mkfiles" --stopstress="/u/gpfstest/bin/gerontion_killer mkfiles"
+   Runs offline fsck against fs1 after major commands. Runs mkfiles stress which is stopped
+   before fsck and started again afterwards.  Since a command string is given for stress,
+   the quotes are not optional.
+  
+4. regressiontest -f fs1 --startstress=/u/steve/bin/startscript --stopstress=/u/steve/bin/stopscript -l 10
+   Starts stress using startscript at the start of each of the 10 loops.  Uses stopscript
+   to stop and clean up stress at the end of each of the 10 loops.
+  
+5. regressiontest -f fs1 -l 1 -p 2
+   This command is useful for verifying ptfs or builds.  It runs through all the commands
+   one time and only pauses 2 seconds between the commands rather than the usual 25
+   seconds.  This gives just enough time for the mmsdrfs to be copied around.
+  
+6. regressiontest -f fs2 | tee /u/steve/tmp/regressiontest.fs2.out 2&gt;&amp;1
+   Same as example 1, but pipes output to a file and the screen.  This allows user to still
+   be able to hit y or n in case it dies at an ok time.
+  
+7. nohup regressiontest -f fs3 --no &gt; /u/steve/tmp/regressiontest.fs3.out 2&gt;&amp;1
+   Same as example 6, but pipes output to a file.  The --no is required if using nohup.
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The help output of gerontion</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /u/gpfstest/bin/gerontion -h
+dirname /u/gpfstest/bin
+Adding /u/gpfstest/stress/gerontion to INC
+Adding /u/gpfstest/bin to INC
+Creating local logdir: /log/gerontion.201222.062802
+arguments:
+Logging gerontion startup to /log/gerontion.201222.062802/gerontionLog.201222.062802.c550f5u28
+No IO flags provided, I am turning on randomFlags
+You requested random flags. Flags enabled are:
+dio 0 mmap 1 aio 1 vio 0 dmapi 0 punchHoleIO 0 fsync 0 clone 0 prealloc 1   compress 1 ea 0 privateFiles 0
+  
+Description: A wrapper that will launch stress on the requested nodes.
+  There are helper utilities in /u/gpfstest/stress/gerontion
+  
+Usage: ./gerontion -N NODES -F FS_NAME [OPTIONS] PROGRAMS
+  
+ General options:
+   -N NODES    Nodes to use. n1,n2,... or a nodefile
+   -F FS_NAME  FS name or mountpoint
+   -f PATH     Relative path within the FS to run programs
+   -w          Exclude Windows nodes
+   -v          Verbose. Prints out all commands being done
+   -s          Silent. Prints minimal output. Good for scripting.
+   -h          help; prints out this help message
+  
+ Fancier options:
+   --oldFileset      Run programs in their own dependent filesets
+   --logdir          Output logs go in this directory; default is /log/gerontion.201222.062802
+   --newFileset      Run programs in their own independent filesets
+   --strace          Run all programs through strace or truss (on aix). You must have already installed strace or truss.
+   --ubi             Runs a particular workload for a ubi critsit, (may 2019)
+   --resume &lt;runID&gt;  Restart this prior gerontion run. No need to provide any additional arguments
+                     Some perl programs don't resume properly. Also, if you have deleted the files being used, this will fail
+   --traceNode localNode,remNode1,...  Cut traces with mmdsh from these nodes.
+                     Use with remote cluster(s) or NFS clients on error.
+                     Provide one node per mmdsh-able cluster
+                     By default, we cut traces on the local cluster.
+   --die             Exit before actually launching the programs. Debugging aid
+   --comment STRING  Annotate your gerontion runs
+   --nodeExclude NODES  Do not use these nodes, even if they are given by -N
+  
+ Controlling program behavior:
+   --randomUsers   Create or chown files using the pfsXXX users from userAdd. Default setting: 1. For &lt;dirsplit iago ioMixer smallSeq cantor&gt;
+   --burst X       Run bursts of I/O interspersed with sleeps of up to X seconds. For &lt;cdata fstest driver thrasher renameSlosh cacheFiller dataInode crDelRddir untar sparsedir tribunal readdirMsg cloneVM kentStress ioMixer mixedMeterIO msgStress aclStress growShrinkDir dirFragmentStress compileStress gpfs_fsscan kgnrdwr cloneloop cloneTree mkfrag mkfiles&gt;
+                   Better mirrors some customer workloads, avoids overloading your cluster
+   --nfsSafe       Do IO in an NFS safe fashion. For &lt;dioReg fsscan driver ioMixer dirsplit kentStress mixedMeterIO smallSeq bufferMixer dirslave&gt;
+   --kafka         Programs should generate output tuned to help debug kafka. For &lt;dirsplit driver bigfile dioReg ioMixer smallSeq qstress kodak dataInode renameSlosh cacheFiller thrasher&gt;
+   --watch         Programs should generate output tuned to help debug Watch Folders. For &lt;dirsplit driver bigfile dioReg ioMixer smallSeq qstress kodak dataInode renameSlosh cacheFiller thrasher&gt;
+   --privateFiles  Nodes do I/O to their own files. For &lt;ioMixer smallSeq dioReg dataInode iago negative_iago bigfile&gt;
+                   For testing the cached fastpath, so it also uses smaller blocksize and fewer files
+   --light         Run programs with minimal intensity
+  
+ Controlling I/O characteristics:
+   --fsync         Use fsync (O_SYNC, fsync, fdatasync). For &lt;iago ioMixer kentStress cloneVM msgStress gpfsDriver thrasher dataInode mixedMeterIO cdata smallSeq kodak&gt;
+   --dio           Use O_DIRECT. For &lt;iago dirsplit tribunal cloneVM kentStress fsscan mixedMeterIO dioReg ioMixer smallSeq kodak cantor&gt;
+   --randdio       Use O_DIRECT randomly. For &lt;iago dirsplit&gt;
+   --mmap          Use mmap. For &lt;fstest detectcorrupt cdata tortdir iozone dirsplit truncbane iago cloneVM kentStress fsscan mixedMeterIO smallSeq driver leveller mmapCache cantor&gt;
+   --disableMMap   Never use mmap. For &lt;checkdata&gt;
+   --randmmap      Use mmap randomly. For &lt;iago&gt;
+   --aio           Use AIO. For &lt;kentStress cloneVM fsscan mixedMeterIO dioReg smallSeq kodak leveller&gt;
+                   For "true AIO", use with --dio. See fvt_file.h for details
+   --vio           Use VIO. For &lt;kentStress cloneVM fsscan mixedMeterIO kodak cantor&gt;
+   --dmapiIO       Use dmapi IO (dm_read/write_invis). For &lt;ioMixer&gt;
+                   You do not need a DMAPI-enabled FS. DO NOT USE UNLESS YOU KNOW WHAT YOU'RE DOING (cf. CMVC.1019071).
+   --punchHoleIO   Use dmapi hole punching. For &lt;ioMixer&gt;
+                   You do not need a DMAPI-enabled FS
+                   DO NOT USE UNLESS YOU KNOW WHAT YOU'RE DOING (See 977646 for warning)
+   --clone         Clone stress. For &lt;detectcorrupt mkfiles kgnrdwr tortdir mkfrag cloneTree iago dirsplit truncbane&gt;
+   --ea            EA stress. For &lt;dbench iago dirsplit driver ioMixer dioReg smallSeq kodak dataInode leveller cantor&gt;
+   --acl           ACL stress. For &lt;iago dirsplit aclStress ioMixer driver smallSeq dioReg kodak dataInode thrasher&gt;
+   --prealloc      Use gpfs_prealloc. For &lt;driver tribunal iago&gt;
+   --percentFallocate: requires --prealloc. For iago only. What percent of the time we should use fallocate vs gpfs_prealloc
+   --compress      Use GPFS compression. For &lt;ioMixer dioReg driver tribunal mixedMeterIO truncbane iago dataInode dirsplit smallSeq kodak leveller cantor&gt;
+   --normalIO      Programs which default to random IO forms will use normal IO instead. For &lt;kentStress cloneVM mixedMeterIO&gt;
+   --all           Enable all flavors of I/O
+                   Clones, declones, compression, eas, prealloc, aio, vio, and a 50-50 pick between mmap and dio
+   --randomFlags   A random selection of I/O flavors
+                   If you provide no flavors of IO (including --normalIO), this is the default
+  
+ Tuning specific programs:
+   tortdir    --overflowOnly --tortdirMaxFiles X
+   readsnap   --readsnapOnePass: read through the snapshot list only once
+   dirsplit   --inodeCreate --dirsplitVerbose X
+   iago       --iago{IO|EA|ACL|Clone}Thread X --iagoVerbose X --iagoMaxBlocks X --iagoBlockSize X
+   truncbane  --truncbaneVerbose X --truncbaneThread X
+   aclStress  --aclStressVerbose X
+   blast      --blastThread X --blastSmallFiles
+   bigfile    --bigfileThreads X
+   qstress    --qstressThreads X --qStressDataPerNode X --qstressInodesPerNode X --qstressUser username --qstressThreads X
+   ioMixer    --ioMixerThreads X --ioMixerVerifyFiles N --ioMixerNoVerifyFiles N --ioMixerPercentDIO X --ioMixerBlocksize X --ioMixerMaxFilesize X
+   cdata      --cdataAppendMode &lt;makes cdata do mostly appends/shrinks
+  
+ Allowed programs:
+     cdata dbench fstest blast locktest iozone cthon detectcorrupt mkfiles dirstress kgnrdwr tortdir checkdata trunctest mkfrag cloneTree iago negative_iago readSnap dirsplit fgdl_dirsplit truncbane driver untar sparsedir handle thrasher tribunal fsscan renameSlosh cacheFiller cloneloop dataInode crDelRddir shadowWriter clonepy bigfile aclStress gpfs_fsscan racer aclsforall growShrinkDir dirFragmentStress readdirMsg msgStress cloneVM kentStress ioMixer dioReg compileStress mixedMeterIO dirRacer smallSeq qstress kodak dirslave seeker singleAppend leveller mmapCache cantor
+     NB fstest and blast are the only ones that run on windows nodes
+   --randomCmd X  In addition to any named programs, start X randomly chosen programs
+   --exclude "P1 P2 ..."  For randomCmd, never use these programs.
+  
+ Magic Keywords:
+   autotest ==&gt; dirstress, kgnrdwr, and tortdir
+   light    ==&gt; cdata, locktest, and checkdata. With minimal intensity.
+  
+Examples:
+  gerontion -N /nodes -F fs0 dbench cdata fstest gpfsperf
+    Run these programs on the nodes in /nodes into FS fs0
+  gerontion -N vmip101,vmip102 -F gpfs1 -f rundir --randomCmd 3 --randomFlags
+    Run 3 programs on these 2 nodes into FS gpfs1 subdir rundir. Use random I/O modes.
+  gerontion ... -c /tmp/newCommands.pl autotest
+    Run the autotest suite using the commands specified in /tmp/newCommands.pl
+  gerontion ... -w -F /NFS_mount_point fstest
+    Run fstest on non-Windows nodes into this NFS mount point
+  gerontion ... --nodeExclude linuxnodes --light ...
+    Exclude linux nodes from this light workload
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The output of mmbackupreg.pl</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ./mmbackupreg.pl -h
+usage:
+mmbackupreg.pl {-f FSNAME}
+        [-N {Node[,Node...]}] [-g sharedirectory] [-l LOGDIR] [-L loopnum] [-m multiThreadNum]
+        [-C] [-v All|{1[,2,3...]}] [--testSnap] [--noRestore] [--cleanall] [-q].
+  
+        [-s tsmserver1[,tsmserver2]].           # default: servers extracted from dsm.sys
+  
+        -f FSNAME: GPFS Filesystem Name.
+        -l LOGDIR: directory for log; default is /log.
+        -L loopnum: loop times; default is 1.
+        -N Node[,Node]: worker nodes that will run parallel instances of the backup process.
+        -g sharedirectory: directory used for worker nodes share temporary files.
+        -C: clear Files/Dirs after complete test cases.
+        -v: choice cases you want to run. default, all cases will be run.
+        -m: multiThreadNum: number of threads mmbackup transfered to mmapplypolicy.
+        --noRestore: just for a tsm bug to not restore files when selinux enabled.
+        --cleanall:  remove all old subdirs below mountdir that mmbackupreg.pl ever created.
+        -q: add -q option for each mmbackup execution to rebuild shadow everytime
+  
+   CASES:
+        case1: mmbackup basic functions test, also rebuilding shadow database file
+        case2: mmbackup test cases for fileset.
+        case3: mmbackup filesystem with snapshot.
+        case4: mmbackup test cases for EAs.
+        case5: mmbackup with exclude/include rules.
+        case6: mmbackup files with ugly names, utf-8 characters and long names.
+        case7: mmbackup a mass of small files.
+        case8: ctime change test.
+        case9: mmbackup files with ACLs.
+        case10: Check mmbackup response to an unmounted file system or to missing TSM client.
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The output of hsmreg.pl</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ./hsmreg.pl
+usage:
+/u/gpfstest/regression/backup_archive/TSM/hsmreg.pl {-f FSNAME}
+        [-s TSM-SERVER] [-l LOGDIR] [-L loopnum]
+        [-T] [-C] [-v All|{1[,2,3...]}].
+        -f FSNAME: GPFS Filesystem Name, ensure the fs is added to TSM server first.
+        -s TSM-SERVER: The TSM-server must have a valid stanza in dsm.sys file.
+            optional if there is only one stanza in dsm.sys
+        -l LOGDIR: directory for log write; default is /log.
+        -L loopnum: loop times; default is 1.
+        -C: clear Files/Dirs after complete test cases.
+        -p Use predefined test file fill pattern - use this if the default (random) is too slow.
+        -t &lt;sec&gt;: custom timeout for automigration and daemon restart on slow nodes.
+        -T: multiprocess mode.
+        -v: choice cases you want to run. default, all cases will be run.
+        --cleanall: remove all old subdirs below mountdir that hsmreg ever created
+  
+   CASES:
+        case1 : dsmmigrate/dsmrecall general files/dirs. [002]~
+        case2 : dsmmigrate/dsmrecall files with EAs/Immutability/AppendOnly. [002]~
+        case3 : migrate/recall using policies. [002]
+        case4 : excluding file(s) from migration by rule, recall on read/write. [002]
+                  + reconciliation[013]
+        case5 : preparation and parallel processing of file lists [005]
+        case6 : moves migrated files within and among filesets (root, dependent, independent)
+        case7 : backup and restore a resident, migrated, premigrated file (stub restore)
+        case8 : whole automigration: filling data to upper threshold, check migrated, premigrated files
+        case9 : Migration using exclude via dsm.sys for files and directories
+        case10: A specialized exclusion test (excl. by rule) exactly covering CQ S1060335
+        case11: Migration + low level backup / restore of a file with direct I/O and EAs
+        case12: dsmmigrate/dsmc ba/restore files with weird names
+        case13: Using different options of the policy engine for migration
+        case14: Check if killed HSM daemons get automatically restarted
+                  ('FOR FILESET','SHOW','ACTION','WHEN').
+        case15: Remove and restore HSM management on a (GPFS) file system
+        case16: Check the presence of necessary HSM callbacks
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/ptf" rel="tag"># ptf</a>
+          
+            
+            <a href="/tag/#/gpfs" rel="tag"># gpfs</a>
+          
+            
+            <a href="/tag/#/gpfstest" rel="tag"># gpfstest</a>
+          
+            
+            <a href="/tag/#/regression" rel="tag"># regression</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/tools/procedure/2021/01/19/How-to-install-open-source-tools-for-AIX/" rel="next" title="How to install open source tools for AIX">
+                <i class="fa fa-chevron-left"></i> How to install open source tools for AIX
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/setup/2021/01/11/How-to-setup-multicluster/" rel="prev" title="How to setup a GPFS multicluster environment">
+                How to setup a GPFS multicluster environment <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/Bob.jpg"
+               alt="Bo Liu" />
+          <p class="site-author-name" itemprop="name">Bo Liu</p>
+           
+              <p class="site-description motion-element" itemprop="description">Memo on my positions on blue journey</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.ibm.com/lbosh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#filesystem-core-regression"> <span class="nav-number">1</span> <span class="nav-text">Filesystem Core Regression</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#prerequisites"> <span class="nav-number">1.1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#steps-to-run-the-regression-test"> <span class="nav-number">1.2</span> <span class="nav-text">Steps to run the regression test</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#mmbackup-and-hsm-regression"> <span class="nav-number">2</span> <span class="nav-text">mmbackup and HSM Regression</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#prerequisites-1"> <span class="nav-number">2.1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#steps-to-run-the-regression-test-1"> <span class="nav-number">2.2</span> <span class="nav-text">Steps to run the regression test</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#multicluster-and-ciperlist-rotation-regression"> <span class="nav-number">3</span> <span class="nav-text">Multicluster and Ciperlist rotation Regression</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#prerequisites-2"> <span class="nav-number">3.1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#steps-to-run-the-regression-test-2"> <span class="nav-number">3.2</span> <span class="nav-text">Steps to run the regression test</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#references"> <span class="nav-number">4</span> <span class="nav-text">References</span> </a> </li>
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy;  2020 - 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo Liu</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+

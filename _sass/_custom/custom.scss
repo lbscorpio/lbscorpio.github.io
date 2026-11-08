@@ -1,0 +1,11 @@
+// Custom styles.
+// Change the URL color to blue while mouse is passing
+.post-body p a{
+  text-align: center;
+  color: #434343;
+  border-bottom: none;
+  &:hover {
+    color: #5073b8;
+    text-decoration: underline;
+  }
+}

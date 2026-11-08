@@ -1,0 +1,1602 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="pd,cp4i,cs,ocp," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="IBM Cloud Platform Common Services provide key foundational services, e.g. logging, monitoring, common web UI and so on. Several IBM Cloud Paks will use some of those services.">
+<meta name="keywords" content="pd, cp4i, cs, ocp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Steps to install IBM Cloud Platform Common Services on an OCP environment">
+<meta property="og:url" content="http://localhost:4000/procedure/2021/02/06/Steps-to-install-IBM-Cloud-Platform-Common-Services/">
+<meta property="og:site_name" content="Bob's Notes">
+<meta property="og:description" content="IBM Cloud Platform Common Services provide key foundational services, e.g. logging, monitoring, common web UI and so on. Several IBM Cloud Paks will use some of those services.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Steps to install IBM Cloud Platform Common Services on an OCP environment">
+<meta name="twitter:description" content="IBM Cloud Platform Common Services provide key foundational services, e.g. logging, monitoring, common web UI and so on. Several IBM Cloud Paks will use some of those services.">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>Steps to install IBM Cloud Platform Common Services on an OCP environment | Bob's Notes</title>
+  
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1QFM7HZ0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J1QFM7HZ0P');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Bob's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/procedure/2021/02/06/Steps-to-install-IBM-Cloud-Platform-Common-Services/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bo Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/Bob.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bob's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            Steps to install IBM Cloud Platform Common Services on an OCP environment
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-02-06T02:11:50+08:00">
+                2021-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/Procedure" itemprop="url" rel="index">
+                    <span itemprop="name">Procedure</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+  <p>IBM Cloud Platform Common Services provide key foundational services, e.g. logging, monitoring, common web UI and so on. Several IBM Cloud Paks will use some of those services.</p>
+
+<h2 id="1-prerequisites">1. Prerequisites</h2>
+
+<h3 id="11-environment-preparation">1.1 Environment Preparation</h3>
+
+<ul>
+  <li><a href="https://www.ibm.com/support/knowledgecenter/SSHKN6/installer/3.x.x/hardware_sizing_reqs.html" target="_blank">Refer hardware sizing requirement in knowledge center</a></li>
+  <li>An existing OCP cluster (Red Hat OpenShift 4.4 or above), I used OCP v4.6.15 for this setup.</li>
+  <li>For a small profile on a Linux x86_64 cluster, common services need at least 6 VPCs and 10 GB memory, minimum number of worker node is 1. For a medium profile on a Linux x86_64 cluster, common services need at least 13 VPCs and 21 GB memory, minimum number of worker node is 3.</li>
+</ul>
+
+<h3 id="12-installation-preparation">1.2 Installation Preparation</h3>
+
+<ol>
+  <li>
+    <p>Ensure that your client have logged in to the web console server, otherwise can’t issue <code class="language-plaintext highlighter-rouge">oc</code> commands on your client.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># oc login</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Ensure that can access OCP web console, running following command to check its URL.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># oc -n openshift-console get route</span>
+NAME        HOST/PORT                                        PATH   SERVICES    PORT    TERMINATION          WILDCARD
+console     console-openshift-console.apps.s07.mcocp.com            console     https   reencrypt/Redirect   None
+</code></pre></div>    </div>
+
+    <p>The console URL in this example is <code class="language-plaintext highlighter-rouge">https://console-openshift-console.apps.s07.mcocp.com/</code>.</p>
+  </li>
+  <li>
+    <p>Ensure a <strong>DEFAULT</strong> storage class, which can be used for creating storage for Common Services.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># oc get storageclasses</span>
+NAME                             PROVISIONER                    RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+sc-iscsi-fs9200-dedup            block.csi.ibm.com              Delete          Immediate              <span class="nb">true                   </span>8d
+sc-iscsi-fs9200-thin <span class="o">(</span>default<span class="o">)</span>   block.csi.ibm.com              Delete          Immediate              <span class="nb">true                   </span>8d
+</code></pre></div>    </div>
+
+    <p>Make a StorageClass as default:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl patch storageclass &lt;storageclass_name&gt; -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>(Optional) For Elasticsearch of logging service, ensure that the vm.max_map_count setting is at least 262144 on all nodes.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># sysctl -a | grep vm.max_map_count
+vm.max_map_count = 262144
+</code></pre></div>    </div>
+
+    <p>If the vm.max_map_count setting is not at least 262144, complete these steps to set the value to 262144:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># cat &lt;&lt;EOF&gt; tuned-cs-es.yaml</span>
+apiVersion: tuned.openshift.io/v1
+kind: Tuned
+metadata:
+ name: common-services-es
+ namespace: openshift-cluster-node-tuning-operator
+spec:
+ profile:
+ - data: |
+     <span class="o">[</span>sysctl]
+     vm.max_map_count<span class="o">=</span>262144
+   name: common-services-es
+ recommend:
+ - priority: 10
+   profile: common-services-es
+EOF
+   
+<span class="c"># oc create -f tuned-cs-es.yaml</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="2-installing-the-ibm-cloud-platform-common-services-operator">2. Installing the IBM Cloud Platform Common Services operator</h2>
+
+<h3 id="21-create-the-ibm-cloud-platform-common-services-catalog-source">2.1 Create the IBM Cloud Platform Common Services catalog source.</h3>
+
+<ul>
+  <li>
+    <p>Prepare a YAML file <code class="language-plaintext highlighter-rouge">opencloud-operators.yaml</code> and create it.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c"># cat &lt;&lt;EOF&gt; opencloud-operators.yaml</span>
+ apiVersion: operators.coreos.com/v1alpha1
+ kind: CatalogSource
+ metadata:
+   name: opencloud-operators
+   namespace: openshift-marketplace
+ spec:
+   displayName: IBMCS Operators
+   publisher: IBM
+   sourceType: grpc
+   image: docker.io/ibmcom/ibm-common-service-catalog:latest
+   updateStrategy:
+     registryPoll:
+       interval: 45m
+ EOF
+   
+ <span class="c"># oc create -f opencloud-operators.yaml</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify that the source container is running:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c"># oc -n openshift-marketplace get pod | grep opencloud-operators</span>
+ opencloud-operators-65ncp                                         1/1     Running     0          35s
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="22-install-the-ibm-cloud-platform-common-services-operator">2.2 Install the IBM Cloud Platform Common Services operator</h3>
+
+<ul>
+  <li>From the navigation pane of OCP web console, click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">OperatorHub</code>.</li>
+  <li>In the <em>All Items</em> field, enter <code class="language-plaintext highlighter-rouge">IBM Cloud Platform Common Services</code>(for v3.6.x) or <code class="language-plaintext highlighter-rouge">IBM Cloud Pak foundational services</code>(for v3.7.x).</li>
+  <li>Click the <code class="language-plaintext highlighter-rouge">IBM Cloud Platform Common Services</code> or <code class="language-plaintext highlighter-rouge">IBM Cloud Pak foundational services</code> tile, then click <code class="language-plaintext highlighter-rouge">Install</code> button.</li>
+  <li>Leave all options as default, click <code class="language-plaintext highlighter-rouge">Install</code> button.</li>
+</ul>
+
+<h3 id="23-setting-the-hardware-profile-to-small-default-is-medium">2.3 Setting the hardware profile to small, default is medium.</h3>
+
+<ul>
+  <li>From the navigation pane of OCP web console, click <code class="language-plaintext highlighter-rouge">Home</code> &gt; <code class="language-plaintext highlighter-rouge">Search</code>.</li>
+  <li>From the Project drop-down list, select <code class="language-plaintext highlighter-rouge">ibm-common-services</code>.</li>
+  <li>From the Resources drop-down list, select <code class="language-plaintext highlighter-rouge">CommonService</code>.</li>
+  <li>Click the <code class="language-plaintext highlighter-rouge">common-service</code> resource, select the YAML tab.</li>
+  <li>Update the <code class="language-plaintext highlighter-rouge">spec.size</code> parameter to small.
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">size</span><span class="pi">:</span> <span class="s">small</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="3-installing-common-services-in-your-cluster">3. Installing common services in your cluster</h2>
+
+<ul>
+  <li>
+    <p>Prepare a YAML file <code class="language-plaintext highlighter-rouge">operand-request.yaml</code> for Common UI as example here and create it.</p>
+
+    <blockquote>
+      <p>Must read the <a href="https://www.ibm.com/support/knowledgecenter/SSHKN6/installer/3.x.x/disable_and_enable_services.html" target="_blank">Common service dependencies</a> before creating the YAML file.</p>
+    </blockquote>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># cat &lt;&lt;EOF&gt; operand-request.yaml</span>
+apiVersion: operator.ibm.com/v1alpha1
+kind: OperandRequest
+metadata:
+  name: common-service
+  namespace: ibm-common-services
+spec:
+  requests:
+    - operands:
+        - name: ibm-cert-manager-operator
+        - name: ibm-mongodb-operator
+        - name: ibm-iam-operator
+          bindings:
+            public-oidc-creds:
+              secret: platform-oidc-credentials
+            public-auth-creds:
+              secret: platform-auth-idp-credentials
+            public-auth-cert:
+              secret: platform-auth-secret
+            public-cam-secret:
+              secret: oauth-client-secret
+            public-cam-map:
+              configmap: oauth-client-map
+            public-auth-config:
+              configmap: platform-auth-idp
+        - name: ibm-management-ingress-operator
+          bindings:
+            public:
+              secret: ibmcloud-cluster-ca-cert
+              configmap: ibmcloud-cluster-info
+        - name: ibm-commonui-operator
+        - name: ibm-ingress-nginx-operator
+        - name: ibm-platform-api-operator
+      registry: common-service
+      registryNamespace: ibm-common-services
+EOF
+    
+<span class="c"># oc apply -f operand-request.yaml</span>
+operandrequest.operator.ibm.com/common-service created
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verifying the installation</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># oc get pods -n ibm-common-services</span>
+NAME                                                    READY   STATUS      RESTARTS   AGE
+auth-idp-79785b8bcc-z8k2d                               4/4     Running     0          11m
+auth-pap-678ddc74cd-sprwr                               2/2     Running     0          16h
+auth-pdp-8c75fb464-2zr5t                                2/2     Running     0          10m
+cert-manager-cainjector-7c5d667b7-d9vsx                 1/1     Running     8          16h
+cert-manager-controller-595cdc44dd-ql25n                1/1     Running     0          16h
+cert-manager-webhook-798d55f5-8pdhv                     1/1     Running     0          16h
+common-web-ui-84db654d9d-q7k55                          2/2     Running     4          16h
+configmap-watcher-587667b6dd-55dvz                      1/1     Running     0          16h
+default-http-backend-8659c9f69b-fxs77                   1/1     Running     0          16h
+iam-onboarding-2k8mp                                    0/1     Completed   0          8m7s
+iam-policy-controller-c994c58cf-8g962                   1/1     Running     0          16h
+ibm-cert-manager-operator-7ff94cb867-hrt4q              1/1     Running     0          16h
+ibm-common-service-webhook-dbd6778cb-4c4xp              1/1     Running     0          5d20h
+ibm-commonui-operator-69d9fc855-lmpjg                   1/1     Running     0          16h
+ibm-iam-operator-68db9bbdd9-nmv8z                       1/1     Running     0          16h
+ibm-ingress-nginx-operator-79d9649689-7ztlw             1/1     Running     0          16h
+ibm-management-ingress-operator-76997c6c9c-tkf6z        1/1     Running     0          16h
+ibm-mongodb-operator-8c88ddf4b-fjmd8                    1/1     Running     0          16h
+ibm-namespace-scope-operator-5659c8d556-hqrrp           1/1     Running     0          5d20h
+ibm-platform-api-operator-b56b6cd58-x9zzw               1/1     Running     4          16h
+icp-mongodb-0                                           2/2     Running     0          7m11s
+management-ingress-7d4c45b444-64xww                     1/1     Running     0          16h
+nginx-ingress-controller-6b49ffdbb5-v7bq6               1/1     Running     0          16h
+oidc-client-registration-csppq                          0/1     Completed   0          16h
+oidcclient-watcher-6758986b95-mtpqq                     1/1     Running     0          7m11s
+operand-deployment-lifecycle-manager-8687fd5d45-7gm46   1/1     Running     0          5d20h
+platform-api-75b4ff5f66-w7xrw                           2/2     Running     0          16h
+secret-watcher-64b4cf87fc-pk62c                         1/1     Running     0          6m2s
+secretshare-6b985c4fd7-f22w5                            1/1     Running     0          5d20h
+security-onboarding-69fbj                               0/1     Completed   0          5m55s
+    
+<span class="c"># oc -n ibm-common-services get csv</span>
+NAME                                          DISPLAY                                VERSION   REPLACES                                      PHASE
+ibm-cert-manager-operator.v3.8.1              IBM Cert Manager                       3.8.1     ibm-cert-manager-operator.v3.8.0              Succeeded
+ibm-common-service-operator.v3.6.3            IBM Cloud Platform Common Services     3.6.3     ibm-common-service-operator.v3.6.2            Succeeded
+ibm-commonui-operator.v1.4.1                  Ibm Common UI                          1.4.1     ibm-commonui-operator.v1.4.0                  Succeeded
+ibm-iam-operator.v3.8.2                       IBM IAM Operator                       3.8.2     ibm-iam-operator.v3.8.1                       Succeeded
+ibm-ingress-nginx-operator.v1.4.1             IBM Ingress Nginx Operator             1.4.1     ibm-ingress-nginx-operator.v1.4.0             Succeeded
+ibm-management-ingress-operator.v1.4.3        Management Ingress Operator            1.4.3     ibm-management-ingress-operator.v1.4.2        Succeeded
+ibm-mongodb-operator.v1.2.1                   IBM MongoDB Operator                   1.2.1     ibm-mongodb-operator.v1.2.0                   Succeeded
+ibm-namespace-scope-operator.v1.0.1           IBM NamespaceScope Operator            1.0.1     ibm-namespace-scope-operator.v1.0.0           Succeeded
+ibm-platform-api-operator.v3.8.1              IBM Platform API                       3.8.1     ibm-platform-api-operator.v3.8.0              Succeeded
+operand-deployment-lifecycle-manager.v1.4.2   Operand Deployment Lifecycle Manager   1.4.2     operand-deployment-lifecycle-manager.v1.4.1   Succeeded
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Accessing the console</p>
+
+    <ul>
+      <li>
+        <p>Use the following command to get the console URL</p>
+
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># oc get route -n ibm-common-services cp-console -o jsonpath=‘{.spec.host}’    ‘cp-console.apps.s07.mcocp.com’
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>Based on the above example output, the console URL would be https://cp-console.apps.s07.mcocp.com:443.</p>
+      </li>
+      <li>
+        <p>Add the entry to the /etc/hosts in your laptop</p>
+
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>9.115.251.187 mc187 cp-console.apps.s07.mcocp.com
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>Log in to <code class="language-plaintext highlighter-rouge">IBM Cloud Pak Administration Hub</code> with above console URL, select authentication type <code class="language-plaintext highlighter-rouge">OpenShift authentication</code>, then you can use kubeadmin to login it.</p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="4-uninstalling-common-services-and-the-relevant-crds">4. Uninstalling common services and the relevant CRDs</h2>
+
+<ul>
+  <li><a href="https://www.ibm.com/support/knowledgecenter/SSHKN6/installer/3.x.x/uninstallation.html" target="_blank">Refer uninstallation in Knowledge Center</a></li>
+  <li>
+    <p>Uninstalling all services</p>
+
+    <p>1) Uninstall the <code class="language-plaintext highlighter-rouge">IBM Cloud Platform Common Services</code> operator</p>
+
+    <ul>
+      <li>From the navigation pane of OCP web console, click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code></li>
+      <li>Switch to the project <code class="language-plaintext highlighter-rouge">ibm-common-services</code>, locate the <code class="language-plaintext highlighter-rouge">IBM Cloud Platform Common Services</code> operator.</li>
+      <li>Select the action <code class="language-plaintext highlighter-rouge">Uninstall Operator</code></li>
+    </ul>
+
+    <p>2) Delete the operator APIs from the <code class="language-plaintext highlighter-rouge">ibm-common-services</code> namespace.</p>
+
+    <ul>
+      <li>
+        <p>Delete the <strong>OperandRequest</strong> instances</p>
+
+        <ul>
+          <li>Click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Operand Deployment Lifecycle Manager</code> &gt; <code class="language-plaintext highlighter-rouge">OperandRequest</code></li>
+          <li>
+            <p>Delete all the <code class="language-plaintext highlighter-rouge">OperandRequest</code> instances that you created</p>
+
+            <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>common-service
+ibm-iam-request
+ibm-mongodb-request
+management-ingress
+platform-api-request
+ibm-commonui-request
+</code></pre></div>            </div>
+          </li>
+          <li>Wait for the <code class="language-plaintext highlighter-rouge">OperandRequest</code> instances to be deleted</li>
+        </ul>
+      </li>
+      <li>
+        <p>Delete the <strong>OperandConfig</strong> instances</p>
+
+        <ul>
+          <li>Click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Operand Deployment Lifecycle Manager</code> &gt; <code class="language-plaintext highlighter-rouge">OperandConfig</code></li>
+          <li>Delete all the <code class="language-plaintext highlighter-rouge">OperandConfig</code> instances (e.g. common-service here)</li>
+        </ul>
+      </li>
+      <li>Delete the <strong>OperandRegistry</strong> instances
+        <ul>
+          <li>Click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Operand Deployment Lifecycle Manager</code> &gt; <code class="language-plaintext highlighter-rouge">OperandRegistry</code></li>
+          <li>Delete all the OperandRegistry instances (e.g. common-service here)</li>
+        </ul>
+      </li>
+      <li>
+        <p>Delete the <strong>NamespaceScope</strong> instances</p>
+
+        <ul>
+          <li>Click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code> &gt; <code class="language-plaintext highlighter-rouge">IBM NamespaceScope Operator</code> &gt; <code class="language-plaintext highlighter-rouge">Namespace Scope</code></li>
+          <li>Delete all the <code class="language-plaintext highlighter-rouge">NamespaceScope</code> instances (e.g. common-service and nss-managedby-odlm here)</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>3) Uninstall the <code class="language-plaintext highlighter-rouge">Operand Deployment Lifecycle Manager</code> operator</p>
+
+    <ul>
+      <li>From the navigation pane of OCP web console, click <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">Installed Operators</code></li>
+      <li>Switch to the project <code class="language-plaintext highlighter-rouge">ibm-common-services</code>, locate the <code class="language-plaintext highlighter-rouge">Operand Deployment Lifecycle Manager operator</code> operator.</li>
+      <li>Select the action <code class="language-plaintext highlighter-rouge">Uninstall Operator</code></li>
+    </ul>
+
+    <p>You also can run the following script to remove all services components, it will do the same actions from above three steps.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># bash &lt;(curl -s https://raw.githubusercontent.com/IBM/ibm-common-service-operator/master/common/scripts/force-uninstall.sh)</span>
+</code></pre></div>    </div>
+
+    <p>4) Remove the following configmaps and namespace</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="c"># oc -n kube-system delete secret icp-mongodb-admin</span>
+   <span class="c"># oc -n kube-system delete secret icp-mongodb-client-cert</span>
+   <span class="c"># oc -n kube-system delete secret icp-serviceid-apikey-secret</span>
+   <span class="c"># oc -n kube-public delete configmap ibm-common-services-status</span>
+   <span class="c"># oc delete mutatingwebhookconfiguration ibm-common-service-webhook-configuration</span>
+   <span class="c"># oc delete namespace services</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Manually delete the CRDs that you do not want</p>
+
+    <p>1) Get the CRDs</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   # oc get crd | grep ibm.com | grep -v csi | grep -v scale
+   authentications.operator.ibm.com                            2021-02-12T12:47:25Z
+   certmanagers.operator.ibm.com                               2021-02-12T12:47:33Z
+   clients.oidc.security.ibm.com                               2021-02-12T12:47:25Z
+   commonservices.operator.ibm.com                             2021-02-07T08:37:21Z
+   commonwebuis.operators.ibm.com                              2021-02-12T12:47:30Z
+   iampolicies.iam.policies.ibm.com                            2021-02-12T12:47:24Z
+   legacyheaders.operators.ibm.com                             2021-02-12T12:47:30Z
+   managementingresses.operator.ibm.com                        2021-02-12T12:47:36Z
+   mongodbs.operator.ibm.com                                   2021-02-12T12:47:44Z
+   namespacescopes.operator.ibm.com                            2021-02-07T08:38:02Z
+   navconfigurations.foundation.ibm.com                        2021-02-12T12:47:31Z
+   nginxingresses.operator.ibm.com                             2021-02-12T12:47:41Z
+   oidcclientwatchers.operator.ibm.com                         2021-02-12T12:47:24Z
+   operandbindinfos.operator.ibm.com                           2021-02-07T08:38:48Z
+   operandconfigs.operator.ibm.com                             2021-02-07T08:38:48Z
+   operandregistries.operator.ibm.com                          2021-02-07T08:38:48Z
+   operandrequests.operator.ibm.com                            2021-02-07T08:38:48Z
+   paps.operator.ibm.com                                       2021-02-12T12:47:24Z
+   platformapis.operator.ibm.com                               2021-02-12T12:47:46Z
+   podpresets.operator.ibm.com                                 2021-02-07T08:38:12Z
+   policycontrollers.operator.ibm.com                          2021-02-12T12:47:25Z
+   policydecisions.operator.ibm.com                            2021-02-12T12:47:25Z
+   secretshares.ibmcpcs.ibm.com                                2021-02-07T08:38:18Z
+   secretwatchers.operator.ibm.com                             2021-02-12T12:47:25Z
+   securityonboardings.operator.ibm.com                        2021-02-12T12:47:25Z
+   switcheritems.operators.ibm.com                             2021-02-12T12:47:30Z
+</code></pre></div>    </div>
+
+    <p>2) Delete the CRDs that you do not want</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   # oc delete crd &lt;CRD1&gt;, &lt;CRD2&gt;, ..., &lt;CRDn&gt;
+     
+   One-line command for this example ONLY:
+   # for i in `oc get crd | grep ibm.com | grep -v csi | grep -v scale | awk -F " " '{print $1}'`; do oc delete crd $i; done
+     
+   If some crd deletion stuck, empty the finalizers.
+   # oc patch crd &lt;CRDx&gt; -p '{"metadata":{"finalizers":[]}}' --type=merge
+     
+   One-line command for this example ONLY:
+   # for i in `oc get crd | grep ibm.com | grep -v csi | grep -v scale | awk -F " " '{print $1}'`; do oc patch crd $i -p '{"metadata":{"finalizers":[]}}' --type=merge; done
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Manually delete the namespace <code class="language-plaintext highlighter-rouge">ibm-common-services</code> if still there</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># oc delete ns ibm-common-services
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="5-references">5. References</h2>
+
+<p><a href="https://www.ibm.com/support/knowledgecenter/SSHKN6/kc_welcome_cs.html" target="_blank">IBM Cloud Platform Common Services</a> from Knowledge Center<br />
+<a href="https://www.ibm.com/support/knowledgecenter/SSGT7J" target="_blank">IBM Cloud Pak for Integration</a> from Knowledge Center<br />
+<a href="https://github.ibm.com/IBMPrivateCloud/BedrockServices" target="_blank">Bedrock Services</a> from GitHub</p>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/pd" rel="tag"># pd</a>
+          
+            
+            <a href="/tag/#/cp4i" rel="tag"># cp4i</a>
+          
+            
+            <a href="/tag/#/cs" rel="tag"># cs</a>
+          
+            
+            <a href="/tag/#/ocp" rel="tag"># ocp</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/procedure/2021/02/23/Steps-to-contribute-on-Opensource/" rel="next" title="Steps to contribute on Open Source projects">
+                <i class="fa fa-chevron-left"></i> Steps to contribute on Open Source projects
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/procedure/2021/01/29/Steps-to-install-IBM-Cloud-Pak-for-Integration/" rel="prev" title="Steps to install IBM Cloud Pak for Integration on an OCP environment">
+                Steps to install IBM Cloud Pak for Integration on an OCP environment <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/Bob.jpg"
+               alt="Bo Liu" />
+          <p class="site-author-name" itemprop="name">Bo Liu</p>
+           
+              <p class="site-description motion-element" itemprop="description">Memo on my positions on blue journey</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.ibm.com/lbosh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#1-prerequisites"> <span class="nav-number">1</span> <span class="nav-text">1. Prerequisites</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#11-environment-preparation"> <span class="nav-number">1.1</span> <span class="nav-text">1.1 Environment Preparation</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#12-installation-preparation"> <span class="nav-number">1.2</span> <span class="nav-text">1.2 Installation Preparation</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#2-installing-the-ibm-cloud-platform-common-services-operator"> <span class="nav-number">2</span> <span class="nav-text">2. Installing the IBM Cloud Platform Common Services operator</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#21-create-the-ibm-cloud-platform-common-services-catalog-source"> <span class="nav-number">2.1</span> <span class="nav-text">2.1 Create the IBM Cloud Platform Common Services catalog source.</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#22-install-the-ibm-cloud-platform-common-services-operator"> <span class="nav-number">2.2</span> <span class="nav-text">2.2 Install the IBM Cloud Platform Common Services operator</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#23-setting-the-hardware-profile-to-small-default-is-medium"> <span class="nav-number">2.3</span> <span class="nav-text">2.3 Setting the hardware profile to small, default is medium.</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#3-installing-common-services-in-your-cluster"> <span class="nav-number">3</span> <span class="nav-text">3. Installing common services in your cluster</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#4-uninstalling-common-services-and-the-relevant-crds"> <span class="nav-number">4</span> <span class="nav-text">4. Uninstalling common services and the relevant CRDs</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#5-references"> <span class="nav-number">5</span> <span class="nav-text">5. References</span> </a> </li>
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy;  2020 - 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo Liu</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+

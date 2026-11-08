@@ -1,0 +1,1485 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ptf,gnr,ess,gpfstest," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="To verify a defect, I have to run mmchrecoverygroup with –active option, but that is only working on an ESS environment after trying different configuration for days.">
+<meta name="keywords" content="ptf, gnr, ess, gpfstest">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to install a PTF build on an ESS environment">
+<meta property="og:url" content="http://localhost:4000/procedure/2020/12/30/How-to-install-PTF-build-on-ESS/">
+<meta property="og:site_name" content="Bob's Notes">
+<meta property="og:description" content="To verify a defect, I have to run mmchrecoverygroup with –active option, but that is only working on an ESS environment after trying different configuration for days.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How to install a PTF build on an ESS environment">
+<meta name="twitter:description" content="To verify a defect, I have to run mmchrecoverygroup with –active option, but that is only working on an ESS environment after trying different configuration for days.">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>How to install a PTF build on an ESS environment | Bob's Notes</title>
+  
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1QFM7HZ0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J1QFM7HZ0P');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Bob's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/procedure/2020/12/30/How-to-install-PTF-build-on-ESS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bo Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/Bob.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bob's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            How to install a PTF build on an ESS environment
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-30T22:48:20+08:00">
+                2020-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/Procedure" itemprop="url" rel="index">
+                    <span itemprop="name">Procedure</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+  <p>To verify a defect, I have to run <em>mmchrecoverygroup</em> with –active option, but that is only working on an ESS environment after trying different configuration for days.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>An ESS environment with existing configuration</li>
+  <li>All nodes in the cluster can mount /u/gpfstest and /u/images</li>
+</ul>
+
+<h2 id="steps-to-install-a-ptf-build">Steps to install a PTF build</h2>
+
+<ol>
+  <li>
+    <p>Mount /u/gpfstest and /u/images</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># mount -t nfs it2n01:/u/gpfstest /u/gpfstest
+# mount -t nfs it2n01:/u/images /u/images
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Find the specific PTF image location (e.g. 5.0.5.5 here), extract it.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /u/images/SPECTRUM_SCALE/5.0.5_tac505/Spectrum_Scale_Product/PTFS/ptf5/SE_Packages/Daily/latest/x86_64/Spectrum_Scale_Erasure_Code-5.0.5.5-x86_64-Linux-install --silent
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Shutdown the GPFS daemon on the node</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /usr/lpp/mmfs/bin/mmshutdown
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Install the rpm packages</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /u/gpfstest/GNR/bin/installgnr.sh /usr/lpp/mmfs/5.0.5.5/gpfs_rpms
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Startup the GPFS daemon on the node</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># /usr/lpp/mmfs/bin/mmstartup
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Repeat above steps on all the remaining nodes</p>
+  </li>
+</ol>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li>
+    <p>(Example) One-line command to install GPFS 5.0.5.5 on one node:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># mount -t nfs it2n01:/u/gpfstest /u/gpfstest; mount -t nfs it2n01:/u/images /u/images; /u/images/SPECTRUM_SCALE/5.0.5_tac505/Spectrum_Scale_Product/PTFS/ptf5/SE_Packages/Daily/latest/x86_64/Spectrum_Scale_Erasure_Code-5.0.5.5-x86_64-Linux-install --silent; /usr/lpp/mmfs/bin/mmshutdown; sleep 5; /u/gpfstest/GNR/bin/installgnr.sh /usr/lpp/mmfs/5.0.5.5/gpfs_rpms; sleep 5; /usr/lpp/mmfs/bin/mmstartup; sleep 10; /usr/lpp/mmfs/bin/mmgetstate -a
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Similar Output of above one-line command(exclude two mount commands):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Extracting License Acceptance Process Tool to /usr/lpp/mmfs/5.0.5.5 ...
+tail -n +641 /u/images/SPECTRUM_SCALE/5.0.5_tac505/Spectrum_Scale_Product/PTFS/ptf5/SE_Packages/Daily/latest/x86_64/Spectrum_Scale_Erasure_Code-5.0.5.5-x86_64-Linux-install | tar -C /usr/lpp/mmfs/5.0.5.5 -xvz --exclude=installer --exclude=*_rpms --exclude=*_debs --exclude=*rpm  --exclude=*tgz --exclude=*deb --exclude=*tools* 1&gt; /dev/null
+  
+Installing JRE ...
+  
+If directory /usr/lpp/mmfs/5.0.5.5 has been created or was previously created during another extraction,
+.rpm, .deb, and repository related files in it (if there were) will be removed to avoid conflicts with the ones being extracted.
+  
+tail -n +641 /u/images/SPECTRUM_SCALE/5.0.5_tac505/Spectrum_Scale_Product/PTFS/ptf5/SE_Packages/Daily/latest/x86_64/Spectrum_Scale_Erasure_Code-5.0.5.5-x86_64-Linux-install | tar -C /usr/lpp/mmfs/5.0.5.5 --wildcards -xvz  ibm-java*tgz 1&gt; /dev/null
+tar -C /usr/lpp/mmfs/5.0.5.5/ -xzf /usr/lpp/mmfs/5.0.5.5/ibm-java*tgz
+  
+Invoking License Acceptance Process Tool ...
+/usr/lpp/mmfs/5.0.5.5/ibm-java-x86_64-80/jre/bin/java -cp /usr/lpp/mmfs/5.0.5.5/LAP_HOME/LAPApp.jar com.ibm.lex.lapapp.LAP -l /usr/lpp/mmfs/5.0.5.5/LA_HOME -m /usr/lpp/mmfs/5.0.5.5 -s /usr/lpp/mmfs/5.0.5.5 -t 5
+  
+License Agreement Terms accepted.
+  
+Extracting Product RPMs to /usr/lpp/mmfs/5.0.5.5 ...
+tail -n +641 /u/images/SPECTRUM_SCALE/5.0.5_tac505/Spectrum_Scale_Product/PTFS/ptf5/SE_Packages/Daily/latest/x86_64/Spectrum_Scale_Erasure_Code-5.0.5.5-x86_64-Linux-install | tar -C /usr/lpp/mmfs/5.0.5.5 --wildcards -xvz  Public_Keys installer gpfs_rpms/rhel/rhel7 hdfs_debs/ubuntu16/hdfs_3.1.0.x hdfs_rpms/rhel7/hdfs_2.7.3.x hdfs_rpms/rhel7/hdfs_3.0.0.x hdfs_rpms/rhel7/hdfs_3.1.0.x hdfs_rpms/rhel7/hdfs_3.1.1.x smb_debs/ubuntu/ubuntu16 smb_debs/ubuntu/ubuntu18 zimon_debs/ubuntu/ubuntu16 zimon_debs/ubuntu/ubuntu18 ganesha_debs/ubuntu16 ganesha_rpms/rhel7 ganesha_rpms/rhel8 ganesha_rpms/sles12 gpfs_debs/ubuntu16 gpfs_rpms/sles12 object_debs/ubuntu16 object_rpms/rhel7 smb_rpms/rhel7 smb_rpms/rhel8 smb_rpms/sles12 tools/repo zimon_debs/ubuntu16 zimon_rpms/rhel7 zimon_rpms/rhel8 zimon_rpms/sles12 zimon_rpms/sles15 gpfs_debs gpfs_rpms manifest 1&gt; /dev/null
+   - Public_Keys
+   - installer
+   - gpfs_rpms/rhel/rhel7
+   - hdfs_debs/ubuntu16/hdfs_3.1.0.x
+   - hdfs_rpms/rhel7/hdfs_2.7.3.x
+   - hdfs_rpms/rhel7/hdfs_3.0.0.x
+   - hdfs_rpms/rhel7/hdfs_3.1.0.x
+   - hdfs_rpms/rhel7/hdfs_3.1.1.x
+   - smb_debs/ubuntu/ubuntu16
+   - smb_debs/ubuntu/ubuntu18
+   - zimon_debs/ubuntu/ubuntu16
+   - zimon_debs/ubuntu/ubuntu18
+   - ganesha_debs/ubuntu16
+   - ganesha_rpms/rhel7
+   - ganesha_rpms/rhel8
+   - ganesha_rpms/sles12
+   - gpfs_debs/ubuntu16
+   - gpfs_rpms/sles12
+   - object_debs/ubuntu16
+   - object_rpms/rhel7
+   - smb_rpms/rhel7
+   - smb_rpms/rhel8
+   - smb_rpms/sles12
+   - tools/repo
+   - zimon_debs/ubuntu16
+   - zimon_rpms/rhel7
+   - zimon_rpms/rhel8
+   - zimon_rpms/sles12
+   - zimon_rpms/sles15
+   - gpfs_debs
+   - gpfs_rpms
+   - manifest
+  
+Removing License Acceptance Process Tool from /usr/lpp/mmfs/5.0.5.5 ...
+rm -rf  /usr/lpp/mmfs/5.0.5.5/LAP_HOME /usr/lpp/mmfs/5.0.5.5/LA_HOME
+  
+Removing JRE from /usr/lpp/mmfs/5.0.5.5 ...
+rm -rf /usr/lpp/mmfs/5.0.5.5/ibm-java*tgz
+  
+==================================================================
+Product packages successfully extracted to /usr/lpp/mmfs/5.0.5.5
+  
+   Cluster installation and protocol deployment
+      To install a cluster or deploy protocols with the Spectrum Scale Install Toolkit:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale -h
+      To install a cluster manually:  Use the gpfs packages located within /usr/lpp/mmfs/5.0.5.5/gpfs_&lt;rpms/debs&gt;
+  
+      To upgrade an existing cluster using the Spectrum Scale Install Toolkit:
+      1) Copy your old clusterdefinition.txt file to the new /usr/lpp/mmfs/5.0.5.5/installer/configuration/ location
+      2) Review and update the config:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale config update
+      3) (Optional) Update the toolkit to reflect the current cluster config:
+         /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale config populate -N &lt;node&gt;
+      4) Run the upgrade:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale upgrade -h
+  
+      To add nodes to an existing cluster using the Spectrum Scale Install Toolkit:
+      1) Add nodes to the clusterdefinition.txt file:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale node add -h
+      2) Install GPFS on the new nodes:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale install -h
+      3) Deploy protocols on the new nodes:  /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale deploy -h
+  
+      To update the toolkit to reflect the current cluster config examples:
+         /usr/lpp/mmfs/5.0.5.5/installer/spectrumscale config populate -N &lt;node&gt;
+      1) Manual updates outside of the install toolkit
+      2) Sync the current cluster state to the install toolkit prior to upgrade
+      3) Switching from a manually managed cluster to the install toolkit
+  
+==================================================================================
+To get up and running quickly, visit our wiki for an IBM Spectrum Scale Protocols Quick Overview:
+https://www.ibm.com/support/knowledgecenter/STXKQY_5.0.5/com.ibm.spectrum.scale.v5r05.doc/pdf/scale_povr.pdf?view=kc
+===================================================================================
+Wed Dec 30 01:21:19 EST 2020: mmshutdown: Starting force unmount of GPFS file systems
+Wed Dec 30 01:21:24 EST 2020: mmshutdown: Shutting down GPFS daemons
+Wed Dec 30 01:21:32 EST 2020: mmshutdown: Finished
+Using '/usr/lpp/mmfs/5.0.5.5/gpfs_rpms' to install gnr build.
+subdir=x86_64-linux
+Firstly, we stop trace if trace is running.
+Install base rpm:
+gpfs.adv-5.0.5-5.x86_64.rpm
+gpfs.base-5.0.5-5.x86_64.rpm
+gpfs.crypto-5.0.5-5.x86_64.rpm
+gpfs.docs-5.0.5-5.noarch.rpm
+  
+gpfs.gpl-5.0.5-5.noarch.rpm
+gpfs.gskit-8.0.55-12.x86_64.rpm
+gpfs.msg.en_US-5.0.5-5.noarch.rpm
+gpfs.gnr-5.0.5-5.x86_64.rpm
+gpfs.gnr.base-1.0.0-0.x86_64.rpm
+gpfs.compression-5.0.5-5.x86_64.rpm
+  
+make[1]: Entering directory `/usr/lpp/mmfs/src'
+rm -rf /usr/lpp/mmfs/src/include /usr/lpp/mmfs/src/bin /usr/lpp/mmfs/src/lib
+mkdir /usr/lpp/mmfs/src/include /usr/lpp/mmfs/src/bin /usr/lpp/mmfs/src/lib
+rm -f //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver
+cleaning (/usr/lpp/mmfs/src/ibm-kxi)
+make[2]: Entering directory `/usr/lpp/mmfs/src/ibm-kxi'
+rm -f trcid.h ibm_kxi.trclst
+rm -f  install.he; \
+ for i in cxiTypes.h cxiSystem.h cxi2gpfs.h cxiVFSStats.h cxiCred.h cxiIOBuffer.h cxiSharedSeg.h cxiMode.h Trace.h cxiMmap.h cxiAtomic.h cxiTSFattr.h cxiAclUser.h cxiLinkList.h cxiDmapi.h LockNames.h lxtrace.h cxiGcryptoDefs.h cxiSynchNames.h cxiMiscNames.h DirIds.h; do \
+    (set -x; rm -f -r /usr/lpp/mmfs/src/include/cxi/$i) done
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiTypes.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiSystem.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxi2gpfs.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiVFSStats.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiCred.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiIOBuffer.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiSharedSeg.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiMode.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/Trace.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiMmap.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiAtomic.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiTSFattr.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiAclUser.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiLinkList.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiDmapi.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/LockNames.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/lxtrace.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiGcryptoDefs.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiSynchNames.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/cxiMiscNames.h
++ rm -f -r /usr/lpp/mmfs/src/include/cxi/DirIds.h
+make[2]: Leaving directory `/usr/lpp/mmfs/src/ibm-kxi'
+cleaning (/usr/lpp/mmfs/src/ibm-linux)
+make[2]: Entering directory `/usr/lpp/mmfs/src/ibm-linux'
+rm -f install.he; \
+ for i in cxiTypes-plat.h cxiSystem-plat.h cxiIOBuffer-plat.h cxiSharedSeg-plat.h cxiMode-plat.h Trace-plat.h cxiAtomic-plat.h cxiMmap-plat.h cxiVFSStats-plat.h cxiCred-plat.h cxiDmapi-plat.h; do \
+                (set -x; rm -rf /usr/lpp/mmfs/src/include/cxi/$i) done
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiTypes-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiSystem-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiIOBuffer-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiSharedSeg-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiMode-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/Trace-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiAtomic-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiMmap-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiVFSStats-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiCred-plat.h
++ rm -rf /usr/lpp/mmfs/src/include/cxi/cxiDmapi-plat.h
+make[2]: Leaving directory `/usr/lpp/mmfs/src/ibm-linux'
+cleaning (/usr/lpp/mmfs/src/gpl-linux)
+make[2]: Entering directory `/usr/lpp/mmfs/src/gpl-linux'
+Pre-kbuild step 1...
+/usr/bin/make -C /usr/src/kernels/3.10.0-327.el7.x86_64 M=/usr/lpp/mmfs/src/gpl-linux clean
+make[3]: Entering directory `/usr/src/kernels/3.10.0-327.el7.x86_64'
+  CLEAN   /usr/lpp/mmfs/src/gpl-linux
+  CLEAN   /usr/lpp/mmfs/src/gpl-linux/.tmp_versions
+  CLEAN   /usr/lpp/mmfs/src/gpl-linux/Module.symvers
+make[3]: Leaving directory `/usr/src/kernels/3.10.0-327.el7.x86_64'
+rm -f -f /lib/modules/`cat //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver`/extra/tracedev.ko
+rm -f -f /lib/modules/`cat //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver`/extra/mmfslinux.ko
+rm -f -f /lib/modules/`cat //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver`/extra/mmfs26.ko
+rm -f -f /usr/lpp/mmfs/src/../bin/lxtrace-`cat //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver`
+rm -f -f /usr/lpp/mmfs/src/../bin/kdump-`cat //usr/lpp/mmfs/src/gpl-linux/gpl_kernel.tmp.ver`
+rm -f -f *.o .depends .*.cmd *.ko *.a *.mod.c core *_shipped *map *mod.c.saved *.symvers *.ko.ver ./*.ver install.he
+rm -f -rf .tmp_versions kdump-kern-dwarfs.c
+rm -f -f gpl-linux.trclst kdump lxtrace
+rm -f -rf usr
+make[2]: Leaving directory `/usr/lpp/mmfs/src/gpl-linux'
+make[1]: Leaving directory `/usr/lpp/mmfs/src'
+warning: file /usr/lpp/mmfs/src/ibm-kxi/trcid.h: remove failed: No such file or directory
+rpm -ivh gpfs.adv-5.0.5-5.x86_64.rpm gpfs.base-5.0.5-5.x86_64.rpm gpfs.crypto-5.0.5-5.x86_64.rpm gpfs.docs-5.0.5-5.noarch.rpm gpfs.gpl-5.0.5-5.noarch.rpm gpfs.gskit-8.0.55-12.x86_64.rpm gpfs.msg.en_US-5.0.5-5.noarch.rpm gpfs.gnr-5.0.5-5.x86_64.rpm gpfs.gnr.base-1.0.0-0.x86_64.rpm gpfs.compression-5.0.5-5.x86_64.rpm
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:gpfs.base-5.0.5-5                ################################# [ 10%]
+Created symlink from /etc/systemd/system/multi-user.target.wants/mmautoload.service to /usr/lib/systemd/system/mmautoload.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/mmccrmonitor.service to /usr/lib/systemd/system/mmccrmonitor.service.
+   2:gpfs.gnr.base-1.0.0-0            ################################# [ 20%]
+   3:gpfs.gnr-5.0.5-5                 ################################# [ 30%]
+   4:gpfs.adv-5.0.5-5                 ################################# [ 40%]
+   5:gpfs.crypto-5.0.5-5              ################################# [ 50%]
+   6:gpfs.gpl-5.0.5-5                 ################################# [ 60%]
+   7:gpfs.compression-5.0.5-5         ################################# [ 70%]
+   8:gpfs.msg.en_US-5.0.5-5           ################################# [ 80%]
+   9:gpfs.gskit-8.0.55-12             ################################# [ 90%]
+  10:gpfs.docs-5.0.5-5                ################################# [100%]
+--------------------------------------------------------
+mmbuildgpl: Building GPL (5.0.5.5) module begins at Wed Dec 30 01:21:59 EST 2020.
+--------------------------------------------------------
+Verifying Kernel Header...
+  kernel version = 31000327 (310000327000000, 3.10.0-327.el7.x86_64, 3.10.0-327)
+  module include dir = /lib/modules/3.10.0-327.el7.x86_64/build/include
+  module build dir   = /lib/modules/3.10.0-327.el7.x86_64/build
+  kernel source dir  = /usr/src/linux-3.10.0-327.el7.x86_64/include
+  Found valid kernel header file under /usr/src/kernels/3.10.0-327.el7.x86_64/include
+Getting Kernel Cipher mode...
+   Will use blkcipher routines
+Verifying Compiler...
+  make is present at /bin/make
+  cpp is present at /bin/cpp
+  gcc is present at /bin/gcc
+  g++ is present at /bin/g++
+  ld is present at /bin/ld
+Verifying Additional System Headers...
+  Verifying kernel-headers is installed ...
+    Command: /bin/rpm -q kernel-headers
+    The required package kernel-headers is installed
+make World ...
+make InstallImages ...
+--------------------------------------------------------
+mmbuildgpl: Building GPL module completed successfully at Wed Dec 30 01:22:11 EST 2020.
+--------------------------------------------------------
+5.0.5 5 Thu Dec 17 15:37:54 2020
+5.0.5 5 Thu Dec 17 15:37:54 2020
+Wed Dec 30 01:22:16 EST 2020: mmstartup: Starting GPFS ...
+  
+ Node number  Node name        GPFS state
+-------------------------------------------
+       1      c49f07n05-ib0    active
+       2      c49f07n06-ib0    active
+       3      c45f04n11-ib0    active
+       4      c45f04n12-ib0    active
+       5      c45f04n13-ib0    active
+       6      c45f04n14-ib0    active
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/ptf" rel="tag"># ptf</a>
+          
+            
+            <a href="/tag/#/gnr" rel="tag"># gnr</a>
+          
+            
+            <a href="/tag/#/ess" rel="tag"># ess</a>
+          
+            
+            <a href="/tag/#/gpfstest" rel="tag"># gpfstest</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/procedure/2020/12/31/How-to-install-VNCserver-on-RHEL/" rel="next" title="How to install VNC Server on RHEL 7.x">
+                <i class="fa fa-chevron-left"></i> How to install VNC Server on RHEL 7.x
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/setup/2020/12/25/How-to-setup-ECE-on-an-incompatible-environmennt/" rel="prev" title="How to setup ECE on an incompatible environment">
+                How to setup ECE on an incompatible environment <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/Bob.jpg"
+               alt="Bo Liu" />
+          <p class="site-author-name" itemprop="name">Bo Liu</p>
+           
+              <p class="site-description motion-element" itemprop="description">Memo on my positions on blue journey</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.ibm.com/lbosh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#prerequisites"> <span class="nav-number">1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#steps-to-install-a-ptf-build"> <span class="nav-number">2</span> <span class="nav-text">Steps to install a PTF build</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#references"> <span class="nav-number">3</span> <span class="nav-text">References</span> </a> </li>
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy;  2020 - 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo Liu</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+

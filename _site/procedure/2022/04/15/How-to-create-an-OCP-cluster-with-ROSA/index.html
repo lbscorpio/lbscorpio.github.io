@@ -1,0 +1,2625 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="fusion,rosa,aws,ocp," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Red Hat OpenShift Service on AWS (ROSA) is a fully-managed OpenShift service, jointly managed and supported by both Red Hat and Amazon Web Services (AWS).">
+<meta name="keywords" content="fusion, rosa, aws, ocp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to create an OCP cluster with ROSA">
+<meta property="og:url" content="http://localhost:4000/procedure/2022/04/15/How-to-create-an-OCP-cluster-with-ROSA/">
+<meta property="og:site_name" content="Bob's Notes">
+<meta property="og:description" content="Red Hat OpenShift Service on AWS (ROSA) is a fully-managed OpenShift service, jointly managed and supported by both Red Hat and Amazon Web Services (AWS).">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How to create an OCP cluster with ROSA">
+<meta name="twitter:description" content="Red Hat OpenShift Service on AWS (ROSA) is a fully-managed OpenShift service, jointly managed and supported by both Red Hat and Amazon Web Services (AWS).">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>How to create an OCP cluster with ROSA | Bob's Notes</title>
+  
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1QFM7HZ0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J1QFM7HZ0P');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Bob's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/procedure/2022/04/15/How-to-create-an-OCP-cluster-with-ROSA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bo Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/Bob.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bob's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            How to create an OCP cluster with ROSA
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-04-15T19:31:21+08:00">
+                2022-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/Procedure" itemprop="url" rel="index">
+                    <span itemprop="name">Procedure</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+  <p>Red Hat OpenShift Service on AWS (ROSA) is a fully-managed OpenShift service, jointly managed and supported by both Red Hat and Amazon Web Services (AWS).</p>
+
+<p>This article will guide you how to create and delete an OCP cluster with ROSA.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>A Red Hat account, which can access <a href="https://console.redhat.com/openshift" target="_blank">Red Hat OpenShift Console</a>.</li>
+  <li>An existing AWS account, which have met the <a href="https://docs.openshift.com/rosa/rosa_planning/rosa-sts-aws-prereqs.html#rosa-account_rosa-sts-aws-prereqs" target="_blank"> AWS prerequisites for ROSA with STS</a> and the <a href="https://docs.openshift.com/rosa/rosa_planning/rosa-sts-required-aws-service-quotas.html" target="_blank">Required AWS service quotas</a>. And you should obtain below access keys to use CLI utility <code class="language-plaintext highlighter-rouge">aws</code>, if not have then create new ones from <a href="https://console.aws.amazon.com/iam/home?#security_credential" target="_blank">AWS security credentials page</a>.
+    <ul>
+      <li>AWS Access Key ID</li>
+      <li>AWS Secret Access Key</li>
+    </ul>
+  </li>
+  <li>Enable ROSA from <a href="https://console.aws.amazon.com/rosa/home" target="_blank">Red Hat OpenShift Service on AWS</a> in your AWS account</li>
+  <li>Get RedHat ROSA token from <a href="https://console.redhat.com/openshift/token/rosa" target="_blank">OpenShift Cluster Manager API Token</a></li>
+  <li>The CLI utilities <a href="https://aws.amazon.com/cli/" target="_blank">aws</a> and <a href="https://www.openshift.com/products/rosa/download" target="_blank">rosa</a> have been installed on your laptop</li>
+</ul>
+
+<h2 id="setting-up-the-environment">Setting up the environment</h2>
+
+<h3 id="configure-the-aws-cli">Configure the AWS CLI</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws configure
+AWS Access Key ID [None]: AKIA0000000000000000
+AWS Secret Access Key [None]: eoZAW00000000000000000000000000000000000
+Default region name [None]: us-east-1
+Default output format [None]: json
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify if the AWS CLI is installed and configured correctly</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws sts get-caller-identity
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="configure-the-rosa-cli">Configure the ROSA CLI</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa login
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify if you are logged in successfully and check your credentials</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa whoami
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="install-and-configure-the-latest-openshift-cli-oc">Install and configure the latest OpenShift CLI (oc)</h3>
+
+<ul>
+  <li>
+    <p>Use the <code class="language-plaintext highlighter-rouge">rosa</code> CLI to download the latest version of the <code class="language-plaintext highlighter-rouge">oc</code> CLI</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa download openshift-client
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Extract and move the binary file to local path</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ tar xvf openshift-client-linux.tar.gz
+$ sudo mv oc /usr/local/bin/oc
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify if the <code class="language-plaintext highlighter-rouge">oc</code> CLI is installed correctly</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa verify openshift-client
+I: Verifying whether OpenShift command-line tool is available...
+I: Current OpenShift Client Version: 4.10.9
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="creating-the-elb-service-role">Creating the ELB service role</h3>
+
+<ul>
+  <li>
+    <p>Check if the <code class="language-plaintext highlighter-rouge">AWSServiceRoleForElasticLoadBalancing</code> role exists for your AWS account</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing"
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>If the AWS ELB service role does not exist, create it:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="verifying-aws-quota-availability">Verifying AWS quota availability</h3>
+
+<ul>
+  <li>
+    <p>Verify if the required resource quotas are available in your default region</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa verify quota
+I: Validating AWS quota...
+I: AWS quota ok. If cluster installation fails, validate actual AWS resource usage against https://docs.openshift.com/rosa/rosa_getting_started/rosa-required-aws-service-quotas.html
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="creating-a-rosa-cluster-with-sts-using-the-default-options">Creating a ROSA cluster with STS using the default options</h2>
+
+<h3 id="create-the-required-account-wide-roles-and-policies-including-the-operator-policies">Create the required account-wide roles and policies, including the Operator policies</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command to create roles and policies:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa create account-roles --mode auto
+I: Logged in as 'lbscorpio' on 'https://api.openshift.com'
+I: Validating AWS credentials...
+I: AWS credentials are valid!
+I: Validating AWS quota...
+E: Insufficient AWS quotas
+E: Error listing AWS service quotas: ec2 AccessDeniedException: User: arn:aws:iam::123926884296:user/priya.kannan@in.ibm.com is not authorized to perform: servicequotas:ListServiceQuotas because no identity-based policy allows the servicequotas:ListServiceQuotas action
+W: Insufficient AWS quotas. Cluster installation might fail.
+I: Verifying whether OpenShift command-line tool is available...
+I: Current OpenShift Client Version: 4.9.23
+I: Creating account roles
+I: Creating roles using 'arn:aws:iam::123926884296:user/priya.kannan@in.ibm.com'
+? Create the 'ManagedOpenShift-Installer-Role' role? Yes
+I: Created role 'ManagedOpenShift-Installer-Role' with ARN 'arn:aws:iam::123926884296:role/ManagedOpenShift-Installer-Role'
+? Create the 'ManagedOpenShift-ControlPlane-Role' role? Yes
+I: Created role 'ManagedOpenShift-ControlPlane-Role' with ARN 'arn:aws:iam::123926884296:role/ManagedOpenShift-ControlPlane-Role'
+? Create the 'ManagedOpenShift-Worker-Role' role? Yes
+I: Created role 'ManagedOpenShift-Worker-Role' with ARN 'arn:aws:iam::123926884296:role/ManagedOpenShift-Worker-Role'
+? Create the 'ManagedOpenShift-Support-Role' role? Yes
+I: Created role 'ManagedOpenShift-Support-Role' with ARN 'arn:aws:iam::123926884296:role/ManagedOpenShift-Support-Role'
+? Create the operator policies? Yes
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-cluster-csi-drivers-ebs-cloud-credent'
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-cloud-network-config-controller-cloud'
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-machine-api-aws-cloud-credentials'
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-cloud-credential-operator-cloud-crede'
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-image-registry-installer-cloud-creden'
+I: Created policy with ARN 'arn:aws:iam::123926884296:policy/ManagedOpenShift-openshift-ingress-operator-cloud-credentials'
+I: To create a cluster with these roles, run the following command:
+rosa create cluster --sts
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="create-a-cluster-with-sts-using-the-defaults">Create a cluster with STS using the defaults</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command to create a cluster:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa create cluster --cluster-name fusion-sds-cns --sts --mode auto -y
+I: Using arn:aws:iam::123926884296:role/ManagedOpenShift-Installer-Role for the Installer role
+I: Using arn:aws:iam::123926884296:role/ManagedOpenShift-ControlPlane-Role for the ControlPlane role
+I: Using arn:aws:iam::123926884296:role/ManagedOpenShift-Worker-Role for the Worker role
+I: Using arn:aws:iam::123926884296:role/ManagedOpenShift-Support-Role for the Support role
+I: Creating cluster 'fusion-sds-cns'
+I: To view a list of clusters and their status, run 'rosa list clusters'
+I: Cluster 'fusion-sds-cns' has been created.
+I: Once the cluster is installed you will need to add an Identity Provider before you can login into the cluster. See 'rosa create idp --help' for more information.
+I: To determine when your cluster is Ready, run 'rosa describe cluster -c fusion-sds-cns'.
+I: To watch your cluster installation logs, run 'rosa logs install -c fusion-sds-cns --watch'.
+Name:                       fusion-sds-cns
+ID:                         1rj85mmgnli982gg4fo525ovaf0t5o4n
+External ID:
+OpenShift Version:
+Channel Group:              stable
+DNS:                        fusion-sds-cns.4qj6.p1.openshiftapps.com
+AWS Account:                123926884296
+API URL:
+Console URL:
+Region:                     us-east-1
+Multi-AZ:                   false
+Nodes:
+ - Control plane:           3
+ - Infra:                   2
+ - Compute:                 2
+Network:
+ - Service CIDR:            172.30.0.0/16
+ - Machine CIDR:            10.0.0.0/16
+ - Pod CIDR:                10.128.0.0/14
+ - Host Prefix:             /23
+STS Role ARN:               arn:aws:iam::123926884296:role/ManagedOpenShift-Installer-Role
+Support Role ARN:           arn:aws:iam::123926884296:role/ManagedOpenShift-Support-Role
+Instance IAM Roles:
+ - Control plane:           arn:aws:iam::123926884296:role/ManagedOpenShift-ControlPlane-Role
+ - Worker:                  arn:aws:iam::123926884296:role/ManagedOpenShift-Worker-Role
+Operator IAM Roles:
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-machine-api-aws-cloud-credentials
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cloud-credential-operator-cloud-cr
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-image-registry-installer-cloud-cre
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-ingress-operator-cloud-credentials
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cluster-csi-drivers-ebs-cloud-cred
+ - arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cloud-network-config-controller-cl
+State:                      waiting (Waiting for OIDC configuration)
+Private:                    No
+Created:                    Apr 15 2022 01:56:48 UTC
+Details Page:               https://console.redhat.com/openshift/details/s/27oYGIIdFddJFRB4tMmRFOB4xWj
+OIDC Endpoint URL:          https://rh-oidc.s3.us-east-1.amazonaws.com/1rj85mmgnli982gg4fo525ovaf0t5o4n
+  
+I: Preparing to create operator roles.
+I: Creating roles using 'arn:aws:iam::123926884296:user/priya.kannan@in.ibm.com'
+I: Created role 'fusion-sds-cns-v1g2-openshift-machine-api-aws-cloud-credentials' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-machine-api-aws-cloud-credentials'
+I: Created role 'fusion-sds-cns-v1g2-openshift-cloud-credential-operator-cloud-cr' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cloud-credential-operator-cloud-cr'
+I: Created role 'fusion-sds-cns-v1g2-openshift-image-registry-installer-cloud-cre' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-image-registry-installer-cloud-cre'
+I: Created role 'fusion-sds-cns-v1g2-openshift-ingress-operator-cloud-credentials' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-ingress-operator-cloud-credentials'
+I: Created role 'fusion-sds-cns-v1g2-openshift-cluster-csi-drivers-ebs-cloud-cred' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cluster-csi-drivers-ebs-cloud-cred'
+I: Created role 'fusion-sds-cns-v1g2-openshift-cloud-network-config-controller-cl' with ARN 'arn:aws:iam::123926884296:role/fusion-sds-cns-v1g2-openshift-cloud-network-config-controller-cl'
+I: Preparing to create OIDC Provider.
+I: Creating OIDC provider using 'arn:aws:iam::123926884296:user/priya.kannan@in.ibm.com'
+I: Created OIDC provider with ARN 'arn:aws:iam::123926884296:oidc-provider/rh-oidc.s3.us-east-1.amazonaws.com/1rj85mmgnli982gg4fo525ovaf0t5o4n'
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="check-the-status-of-your-cluster">Check the status of your cluster</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ rosa describe cluster --cluster &lt;cluster_name|cluster_id&gt;
+ 
+ Example:
+ $ rosa describe cluster --cluster  1rir0e44l46sv8lmpmhrt7uullilf1aq
+ Name:                       fusion-sds-cns
+ ID:                         1rir0e44l46sv8lmpmhrt7uullilf1aq
+ External ID:
+ OpenShift Version:
+ Channel Group:              stable
+ DNS:                        fusion-sds-cns.dyje.p1.openshiftapps.com
+ AWS Account:                123926884296
+ API URL:
+ Console URL:
+ Region:                     us-east-1
+ Multi-AZ:                   false
+ Nodes:
+  - Control plane:           3
+  - Infra:                   2
+  - Compute:                 2
+ Network:
+  - Service CIDR:            172.30.0.0/16
+  - Machine CIDR:            10.0.0.0/16
+  - Pod CIDR:                10.128.0.0/14
+  - Host Prefix:             /23
+ STS Role ARN:               arn:aws:iam::123926884296:role/ManagedOpenShift-Installer-Role
+ Support Role ARN:           arn:aws:iam::123926884296:role/ManagedOpenShift-Support-Role
+ Instance IAM Roles:
+  - Control plane:           arn:aws:iam::123926884296:role/ManagedOpenShift-ControlPlane-Role
+  - Worker:                  arn:aws:iam::123926884296:role/ManagedOpenShift-Worker-Role
+ Operator IAM Roles:
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cloud-network-config-controller-cl
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-machine-api-aws-cloud-credentials
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cloud-credential-operator-cloud-cr
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-image-registry-installer-cloud-cre
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-ingress-operator-cloud-credentials
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cluster-csi-drivers-ebs-cloud-cred
+ State:                      pending (Preparing account)
+ Private:                    No
+ Created:                    Apr 14 2022 10:58:08 UTC
+ Details Page:               https://console.redhat.com/openshift/details/s/27mmyCTWLl7gZq26TzldvtgcF8U
+ OIDC Endpoint URL:          https://rh-oidc.s3.us-east-1.amazonaws.com/1rir0e44l46sv8lmpmhrt7uullilf1aq
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="track-the-progress-of-the-cluster-creation-by-watching-the-openshift-installer-logs">Track the progress of the cluster creation by watching the OpenShift installer logs</h3>
+
+<ul>
+  <li>
+    <p>In the terminal, enter the following command:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ rosa logs install --cluster &lt;cluster_name|cluster_id&gt; --watch 
+  
+ Example:
+ $ rosa logs install --cluster fusion-sds-cns --watch
+ I: Cluster 'fusion-sds-cns' is in installing state waiting for installation to begin. Logs will show up within 5 minutes
+ | time="2022-04-15T03:11:51Z" level=debug msg="    Reusing previously-fetched Certificate (admin-kubeconfig-ca-bundle)"
+ time="2022-04-15T03:11:51Z" level=debug msg="    Fetching Certificate (kubelet-client-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kubelet-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Generating Certificate (kubelet-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Generating Certificate (kubelet-client-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Fetching Certificate (kube-control-plane-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kube-control-plane-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Generating Certificate (kube-control-plane-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kube-apiserver-lb-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Reusing previously-fetched Certificate (kube-apiserver-lb-signer)"
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kube-apiserver-localhost-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Reusing previously-fetched Certificate (kube-apiserver-localhost-signer)"
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kube-apiserver-service-network-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Reusing previously-fetched Certificate (kube-apiserver-service-network-signer)"
+ time="2022-04-15T03:11:51Z" level=debug msg="    Generating Certificate (kube-control-plane-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Fetching Certificate (kube-apiserver-to-kubelet-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kube-apiserver-to-kubelet-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Generating Certificate (kube-apiserver-to-kubelet-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Generating Certificate (kube-apiserver-to-kubelet-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Fetching Certificate (kubelet-bootstrap-kubeconfig-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Fetching Certificate (kubelet-bootstrap-kubeconfig-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="      Reusing previously-fetched Certificate (kubelet-bootstrap-kubeconfig-signer)"
+ time="2022-04-15T03:11:51Z" level=debug msg="    Generating Certificate (kubelet-bootstrap-kubeconfig-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="  Generating Certificate (kube-apiserver-complete-client-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="  Fetching Certificate (kube-apiserver-to-kubelet-ca-bundle)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="  Reusing previously-fetched Certificate (kube-apiserver-to-kubelet-ca-bundle)"
+ time="2022-04-15T03:11:51Z" level=debug msg="  Fetching Certificate (kube-apiserver-to-kubelet-client)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Fetching Certificate (kube-apiserver-to-kubelet-signer)..."
+ time="2022-04-15T03:11:51Z" level=debug msg="    Reusing previously-fetched Certificate (kube-apiserver-to-kubelet-signer)"
+ time="2022-04-15T03:11:51Z" level=debug msg="  Generating Certificate (kube-apiserver-to-kubelet-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kube-apiserver-to-kubelet-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kube-apiserver-to-kubelet-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kube-control-plane-ca-bundle)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kube-control-plane-ca-bundle)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kube-control-plane-kube-controller-manager-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Fetching Certificate (kube-control-plane-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Reusing previously-fetched Certificate (kube-control-plane-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating Certificate (kube-control-plane-kube-controller-manager-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kube-control-plane-kube-scheduler-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Fetching Certificate (kube-control-plane-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Reusing previously-fetched Certificate (kube-control-plane-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating Certificate (kube-control-plane-kube-scheduler-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kube-control-plane-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kube-control-plane-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kubelet-bootstrap-kubeconfig-ca-bundle)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kubelet-bootstrap-kubeconfig-ca-bundle)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kubelet-client-ca-bundle)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kubelet-client-ca-bundle)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kubelet-client)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kubelet-client)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kubelet-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (kubelet-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (kubelet-serving-ca-bundle)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Fetching Certificate (kubelet-signer)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Reusing previously-fetched Certificate (kubelet-signer)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating Certificate (kubelet-serving-ca-bundle)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Certificate (mcs)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Certificate (mcs)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Root CA..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Root CA"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Key Pair (service-account.pub)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating Key Pair (service-account.pub)..."
+ time="2022-04-15T03:11:52Z" level=debug msg="Failed to marshal PKIX public key: %!s(&lt;nil&gt;)"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Release Image Pull Spec..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating Release Image Pull Spec..."
+ time="2022-04-15T03:11:52Z" level=warning msg="Found override for release image. Please be warned, this is not advised"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Image..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Image"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching CVO Ignore..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Fetching Common Manifests..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Reusing previously-fetched Common Manifests"
+ time="2022-04-15T03:11:52Z" level=debug msg="    Fetching Openshift Manifests..."
+ time="2022-04-15T03:11:52Z" level=debug msg="    Reusing previously-fetched Openshift Manifests"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Generating CVO Ignore..."
+ time="2022-04-15T03:11:52Z" level=debug msg="Generating Bootstrap Ignition Config..."
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming OpenShift Install (Manifests) from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"OpenShift Install (Manifests)\" from disk"
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming Common Manifests from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"Common Manifests\" from disk"
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming User-provided Service Account Signing key from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"User-provided Service Account Signing key\" from disk"
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming Openshift Manifests from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"Openshift Manifests\" from disk"
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming Master Machines from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"Master Machines\" from disk"
+ time="2022-04-15T03:11:52Z" level=info msg="Consuming Worker Machines from target directory"
+ time="2022-04-15T03:11:52Z" level=debug msg="Purging asset \"Worker Machines\" from disk"
+ time="2022-04-15T03:11:52Z" level=debug msg="Fetching Metadata..."
+ time="2022-04-15T03:11:52Z" level=debug msg="Loading Metadata..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Loading Cluster ID..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Loading Install Config..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Loading Bootstrap Ignition Config..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Cluster ID..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Cluster ID"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Install Config..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Install Config"
+ time="2022-04-15T03:11:52Z" level=debug msg="  Fetching Bootstrap Ignition Config..."
+ time="2022-04-15T03:11:52Z" level=debug msg="  Reusing previously-fetched Bootstrap Ignition Config"
+ time="2022-04-15T03:11:52Z" level=debug msg="Generating Metadata..."
+ time="2022-04-15T03:11:52Z" level=info msg="Ignition-Configs created in: . and auth"
+ time="2022-04-15T03:11:54Z" level=debug msg="  Loading Certificate (admin-kubeconfig-client)..."
+ time="2022-04-15T03:11:54Z" level=debug msg="  Loading Certificate (kube-apiserver-complete-server-ca-bundle)..."
+ time="2022-04-15T03:11:54Z" level=debug msg="  Loading Install Config..."
+ time="2022-04-15T03:11:54Z" level=debug msg="Loading Kubeconfig Admin Client from both state file and target directory"
+ time="2022-04-15T03:11:54Z" level=debug msg="On-disk Kubeconfig Admin Client matches asset in state file"
+ time="2022-04-15T03:11:54Z" level=debug msg="Using Kubeconfig Admin Client loaded from state file"
+ time="2022-04-15T03:11:54Z" level=debug msg="Reusing previously-fetched Kubeconfig Admin Client"
+ REDACTED LINE OF OUTPUT
+ REDACTED LINE OF OUTPUT
+ time="2022-04-15T03:11:55Z" level=debug msg="Fetching Certificate (journal-gatewayd)..."
+ time="2022-04-15T03:11:55Z" level=debug msg="Reusing previously-fetched Certificate (journal-gatewayd)"
+ time="2022-04-15T03:11:55Z" level=debug msg="Fetching Cluster..."
+ time="2022-04-15T03:11:55Z" level=debug msg="Loading Cluster..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Cluster ID..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Platform Credentials Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Platform Permissions Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Loading Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Platform Provisioning Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Platform Quota Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Loading Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Loading Master Machines..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Loading Worker Machines..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Loading Terraform Variables..."
+ REDACTED LINE OF OUTPUT
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Cluster ID..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Reusing previously-fetched Cluster ID"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Reusing previously-fetched Install Config"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Platform Credentials Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Reusing previously-fetched Platform Credentials Check"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Platform Permissions Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Fetching Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Reusing previously-fetched Install Config"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Generating Platform Permissions Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Platform Provisioning Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Reusing previously-fetched Platform Provisioning Check"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Platform Quota Check..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Fetching Install Config..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Reusing previously-fetched Install Config"
+ time="2022-04-15T03:11:55Z" level=debug msg="    Fetching Master Machines..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Reusing previously-fetched Master Machines"
+ time="2022-04-15T03:11:55Z" level=debug msg="    Fetching Worker Machines..."
+ time="2022-04-15T03:11:55Z" level=debug msg="    Reusing previously-fetched Worker Machines"
+ time="2022-04-15T03:11:55Z" level=debug msg="  Generating Platform Quota Check..."
+ time="2022-04-15T03:11:55Z" level=warning msg="Missing permissions to fetch Quotas and therefore will skip checking them: failed to load limits for servicequotas: failed to list default serviceqquotas for ec2: AccessDeniedException: User: arn:aws:sts::123926884296:assumed-role/ManagedOpenShift-Installer-Role/1649992314413445594 is not authorized to perform: servicequotas:ListAWSDefaultServiceQuotas because no identity-based policy allows the servicequotas:ListAWSDefaultServiceQuotas action, make sure you have `servicequotas:ListAWSDefaultServiceQuotas` permission available to the user."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Fetching Terraform Variables..."
+ time="2022-04-15T03:11:55Z" level=debug msg="  Reusing previously-fetched Terraform Variables"
+ REDACTED LINE OF OUTPUT
+ REDACTED LINE OF OUTPUT
+ time="2022-04-15T03:11:55Z" level=debug msg="Generating Cluster..."
+ time="2022-04-15T03:11:55Z" level=info msg="Creating infrastructure resources..."
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-ibm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/ibm/1.0.0/linux_amd64/terraform-provider-ibm\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-local src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/local/1.0.0/linux_amd64/terraform-provider-local\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-ovirt src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/ovirt/1.0.0/linux_amd64/terraform-provider-ovirt\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-vsphere src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/vsphere/1.0.0/linux_amd64/terraform-provider-vsphere\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-azureprivatedns src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/azureprivatedns/1.0.0/linux_amd64/terraform-provider-azureprivatedns\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-alicloud src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/alicloud/1.0.0/linux_amd64/terraform-provider-alicloud\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-aws src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/aws/1.0.0/linux_amd64/terraform-provider-aws\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-google src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/google/1.0.0/linux_amd64/terraform-provider-google\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-azurerm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/azurerm/1.0.0/linux_amd64/terraform-provider-azurerm\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-azurestack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/azurestack/1.0.0/linux_amd64/terraform-provider-azurestack\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-ignition src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/ignition/1.0.0/linux_amd64/terraform-provider-ignition\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-openstack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/openstack/1.0.0/linux_amd64/terraform-provider-openstack\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-random src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/random/1.0.0/linux_amd64/terraform-provider-random\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Symlinking plugin terraform-provider-vsphereprivate src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-cluster-2460946598/plugins/openshift/local/vsphereprivate/1.0.0/linux_amd64/terraform-provider-vsphereprivate\""
+ time="2022-04-15T03:11:55Z" level=debug msg="Initializing modules..."
+ time="2022-04-15T03:11:55Z" level=debug msg="- dns in ../tmp/openshift-install-cluster-2460946598/route53"
+ time="2022-04-15T03:11:55Z" level=debug msg="- iam in ../tmp/openshift-install-cluster-2460946598/iam"
+ time="2022-04-15T03:11:55Z" level=debug msg="- masters in ../tmp/openshift-install-cluster-2460946598/master"
+ time="2022-04-15T03:11:55Z" level=debug msg="- vpc in ../tmp/openshift-install-cluster-2460946598/vpc"
+ time="2022-04-15T03:11:55Z" level=debug
+ time="2022-04-15T03:11:55Z" level=debug msg="Initializing the backend..."
+ time="2022-04-15T03:11:55Z" level=debug
+ time="2022-04-15T03:11:55Z" level=debug msg="Initializing provider plugins..."
+ time="2022-04-15T03:11:55Z" level=debug msg="- Finding latest version of openshift/local/aws..."
+ time="2022-04-15T03:11:55Z" level=debug msg="- Installing openshift/local/aws v1.0.0..."
+ time="2022-04-15T03:11:57Z" level=debug msg="- Installed openshift/local/aws v1.0.0 (unauthenticated)"
+ time="2022-04-15T03:11:57Z" level=debug
+ time="2022-04-15T03:11:57Z" level=debug msg="Terraform has created a lock file .terraform.lock.hcl to record the provider"
+ time="2022-04-15T03:11:57Z" level=debug msg="selections it made above. Include this file in your version control repository"
+ time="2022-04-15T03:11:57Z" level=debug msg="so that Terraform can guarantee to make the same selections by default when"
+ time="2022-04-15T03:11:57Z" level=debug msg="you run \"terraform init\" in the future."
+ time="2022-04-15T03:11:57Z" level=debug
+ time="2022-04-15T03:11:57Z" level=debug msg="Terraform has been successfully initialized!"
+ time="2022-04-15T03:11:57Z" level=debug
+ time="2022-04-15T03:11:57Z" level=debug msg="You may now begin working with Terraform. Try running \"terraform plan\" to see"
+ time="2022-04-15T03:11:57Z" level=debug msg="any changes that are required for your infrastructure. All Terraform commands"
+ time="2022-04-15T03:11:57Z" level=debug msg="should now work."
+ time="2022-04-15T03:11:57Z" level=debug
+ time="2022-04-15T03:11:57Z" level=debug msg="If you ever set or change modules or backend configuration for Terraform,"
+ time="2022-04-15T03:11:57Z" level=debug msg="rerun this command to reinitialize your working directory. If you forget, other"
+ time="2022-04-15T03:11:57Z" level=debug msg="commands will detect it and remind you to do so if necessary."
+ time="2022-04-15T03:12:01Z" level=debug msg="module.iam.aws_iam_instance_profile.worker: Creating..."
+ time="2022-04-15T03:12:01Z" level=debug msg="module.masters.aws_iam_instance_profile.master: Creating..."
+ time="2022-04-15T03:12:01Z" level=debug msg="module.vpc.aws_vpc_dhcp_options.main[0]: Creating..."
+ time="2022-04-15T03:12:01Z" level=debug msg="module.vpc.aws_vpc.new_vpc[0]: Creating..."
+ time="2022-04-15T03:12:01Z" level=debug msg="module.iam.aws_iam_instance_profile.worker: Creation complete after 0s [id=fusion-sds-cns-jwnmv-worker-profile]"
+ time="2022-04-15T03:12:01Z" level=debug msg="module.masters.aws_iam_instance_profile.master: Creation complete after 1s [id=fusion-sds-cns-jwnmv-master-profile]"
+ time="2022-04-15T03:12:02Z" level=debug msg="module.vpc.aws_vpc_dhcp_options.main[0]: Creation complete after 1s [id=dopt-0400b809d61a4fb8f]"
+ time="2022-04-15T03:12:11Z" level=debug msg="module.vpc.aws_vpc.new_vpc[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_vpc.new_vpc[0]: Creation complete after 13s [id=vpc-080c75db6b0053960]"
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.data.aws_vpc.cluster_vpc: Reading..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.data.aws_vpc.cluster_vpc: Read complete after 0s [id=vpc-080c75db6b0053960]"
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_route_table.private_routes[0]: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_route_table.default[0]: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_lb_target_group.api_external[0]: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_vpc_dhcp_options_association.main[0]: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_security_group.master: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_lb_target_group.services: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_security_group.worker: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_lb_target_group.api_internal: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_internet_gateway.igw[0]: Creating..."
+ time="2022-04-15T03:12:13Z" level=debug msg="module.vpc.aws_subnet.public_subnet[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_vpc_dhcp_options_association.main[0]: Creation complete after 0s [id=dopt-0400b809d61a4fb8f-vpc-080c75db6b0053960]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_subnet.private_subnet[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_route_table.default[0]: Creation complete after 0s [id=rtb-07d26a40cf5015129]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_main_route_table_association.main_vpc_routes[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_route_table.private_routes[0]: Creation complete after 0s [id=rtb-051a3c59e69b8c89e]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_lb_target_group.api_internal: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_vpc_endpoint.s3[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_internet_gateway.igw[0]: Creation complete after 1s [id=igw-01bcc68b13636aeb1]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_route.igw_route[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_lb_target_group.api_external[0]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_eip.nat_eip[0]: Creating..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_main_route_table_association.main_vpc_routes[0]: Creation complete after 1s [id=rtbassoc-09ed12ca1403d52d7]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_lb_target_group.services: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_subnet.public_subnet[0]: Creation complete after 1s [id=subnet-098e53d6d909e8e67]"
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.data.aws_subnet.public[0]: Reading..."
+ time="2022-04-15T03:12:14Z" level=debug msg="module.vpc.aws_route_table_association.route_net[0]: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_route_table_association.route_net[0]: Creation complete after 0s [id=rtbassoc-0c4000105f024853b]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.data.aws_subnet.public[0]: Read complete after 0s [id=subnet-098e53d6d909e8e67]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_subnet.private_subnet[0]: Creation complete after 1s [id=subnet-04f3764dee50b5111]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.data.aws_subnet.private[0]: Reading..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_route_table_association.private_routing[0]: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_route.igw_route[0]: Creation complete after 0s [id=r-rtb-07d26a40cf50151291080289494]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_route_table_association.private_routing[0]: Creation complete after 0s [id=rtbassoc-0467181973a02af3c]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_eip.nat_eip[0]: Creation complete after 0s [id=eipalloc-03dbfe9f5585502ba]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.data.aws_subnet.private[0]: Read complete after 0s [id=subnet-04f3764dee50b5111]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_lb.api_internal: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_security_group.worker: Creation complete after 2s [id=sg-0292ae8208d50d513]"
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_vxlan: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike: Creating..."
+ time="2022-04-15T03:12:15Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_kubelet_insecure: Creating..."
+ time="2022-04-15T03:12:16Z" level=debug msg="module.vpc.aws_security_group.master: Creation complete after 2s [id=sg-06485904f1e0836ca]"
+ time="2022-04-15T03:12:16Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_udp: Creating..."
+ time="2022-04-15T03:12:16Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_kubelet_insecure: Creation complete after 1s [id=sgrule-2753771242]"
+ time="2022-04-15T03:12:16Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ssh: Creating..."
+ time="2022-04-15T03:12:17Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike: Creation complete after 2s [id=sgrule-2605830365]"
+ time="2022-04-15T03:12:17Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_udp: Creating..."
+ time="2022-04-15T03:12:18Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_vxlan: Creation complete after 3s [id=sgrule-1706694137]"
+ time="2022-04-15T03:12:18Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike_nat_t: Creating..."
+ time="2022-04-15T03:12:19Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal: Creation complete after 3s [id=sgrule-300273047]"
+ time="2022-04-15T03:12:19Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_geneve: Creating..."
+ time="2022-04-15T03:12:20Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_udp: Creation complete after 4s [id=sgrule-3817984140]"
+ time="2022-04-15T03:12:20Z" level=debug msg="module.vpc.aws_security_group_rule.worker_egress: Creating..."
+ time="2022-04-15T03:12:20Z" level=debug msg="module.vpc.aws_vpc_endpoint.s3[0]: Creation complete after 6s [id=vpce-01ae95ecbf404be19]"
+ time="2022-04-15T03:12:20Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_esp: Creating..."
+ time="2022-04-15T03:12:21Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ssh: Creation complete after 4s [id=sgrule-3613546138]"
+ time="2022-04-15T03:12:21Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_icmp: Creating..."
+ time="2022-04-15T03:12:21Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_udp: Creation complete after 4s [id=sgrule-3048894072]"
+ time="2022-04-15T03:12:21Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_tcp: Creating..."
+ time="2022-04-15T03:12:22Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike_nat_t: Creation complete after 4s [id=sgrule-3732927829]"
+ time="2022-04-15T03:12:22Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_udp_from_master: Creating..."
+ time="2022-04-15T03:12:23Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_geneve: Creation complete after 4s [id=sgrule-3916588225]"
+ time="2022-04-15T03:12:23Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kubelet_secure: Creating..."
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kubelet_secure: Creation complete after 1s [id=sgrule-2689702833]"
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.worker_egress: Creation complete after 4s [id=sgrule-418936057]"
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_udp: Creating..."
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_controller_manager_from_worker: Creating..."
+ time="2022-04-15T03:12:24Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_esp: Creation complete after 5s [id=sgrule-617914322]"
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_vxlan_from_worker: Creating..."
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_udp: Creation complete after 1s [id=sgrule-3890445783]"
+ time="2022-04-15T03:12:24Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_tcp_from_worker: Creating..."
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_icmp: Creation complete after 4s [id=sgrule-4154432014]"
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kubelet_secure_from_worker: Creating..."
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_controller_manager_from_worker: Creation complete after 1s [id=sgrule-609377793]"
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_esp_from_worker: Creating..."
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:25Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_vxlan_from_worker: Creation complete after 1s [id=sgrule-1853131568]"
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_esp_from_master: Creating..."
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_tcp_from_worker: Creation complete after 2s [id=sgrule-1245817577]"
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_https: Creating..."
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_tcp: Creation complete after 5s [id=sgrule-1204712291]"
+ time="2022-04-15T03:12:26Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_icmp: Creating..."
+ time="2022-04-15T03:12:27Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kubelet_secure_from_worker: Creation complete after 2s [id=sgrule-2846682976]"
+ time="2022-04-15T03:12:27Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_from_worker: Creating..."
+ time="2022-04-15T03:12:27Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_udp_from_master: Creation complete after 5s [id=sgrule-3932988509]"
+ time="2022-04-15T03:12:27Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_scheduler_from_worker: Creating..."
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_esp_from_worker: Creation complete after 3s [id=sgrule-179569144]"
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.master_egress: Creating..."
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_https: Creation complete after 2s [id=sgrule-1189388353]"
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_vxlan_from_master: Creating..."
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_esp_from_master: Creation complete after 3s [id=sgrule-757721859]"
+ time="2022-04-15T03:12:28Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_geneve_from_master: Creating..."
+ time="2022-04-15T03:12:29Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_icmp: Creation complete after 3s [id=sgrule-2291948574]"
+ time="2022-04-15T03:12:29Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_tcp_from_master: Creating..."
+ time="2022-04-15T03:12:29Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_vxlan_from_master: Creation complete after 1s [id=sgrule-1816617256]"
+ time="2022-04-15T03:12:29Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_from_master: Creating..."
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_from_worker: Creation complete after 3s [id=sgrule-9721472]"
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.master_mcs: Creating..."
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_geneve_from_master: Creation complete after 1s [id=sgrule-3767472144]"
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_vxlan: Creating..."
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_services_tcp_from_master: Creation complete after 1s [id=sgrule-1311967154]"
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_scheduler_from_worker: Creation complete after 3s [id=sgrule-3839769218]"
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_udp: Creating..."
+ time="2022-04-15T03:12:30Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike_from_master: Creating..."
+ time="2022-04-15T03:12:31Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_from_master: Creation complete after 2s [id=sgrule-404273478]"
+ time="2022-04-15T03:12:31Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ovndb: Creating..."
+ time="2022-04-15T03:12:31Z" level=debug msg="module.vpc.aws_security_group_rule.master_egress: Creation complete after 4s [id=sgrule-3632009418]"
+ time="2022-04-15T03:12:31Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_nat_t_from_worker: Creating..."
+ time="2022-04-15T03:12:32Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_ike_from_master: Creation complete after 1s [id=sgrule-2460787724]"
+ time="2022-04-15T03:12:32Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal: Creating..."
+ time="2022-04-15T03:12:32Z" level=debug msg="module.vpc.aws_security_group_rule.master_mcs: Creation complete after 3s [id=sgrule-3788644071]"
+ time="2022-04-15T03:12:32Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_udp_from_worker: Creating..."
+ time="2022-04-15T03:12:33Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_vxlan: Creation complete after 4s [id=sgrule-1737097185]"
+ time="2022-04-15T03:12:33Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_geneve: Creating..."
+ time="2022-04-15T03:12:34Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_udp: Creation complete after 3s [id=sgrule-3079242848]"
+ time="2022-04-15T03:12:34Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_nat_t: Creating..."
+ time="2022-04-15T03:12:34Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ovndb: Creation complete after 3s [id=sgrule-2871832656]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike: Creating..."
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [20s elapsed]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_nat_t_from_worker: Creation complete after 4s [id=sgrule-3585174428]"
+ time="2022-04-15T03:12:35Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_nat_t_from_master: Creating..."
+ time="2022-04-15T03:12:36Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal: Creation complete after 5s [id=sgrule-332801935]"
+ time="2022-04-15T03:12:36Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_kubelet_insecure_from_master: Creating..."
+ time="2022-04-15T03:12:36Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_nat_t_from_master: Creation complete after 1s [id=sgrule-3615654276]"
+ time="2022-04-15T03:12:36Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_from_worker: Creating..."
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_kubelet_insecure_from_master: Creation complete after 0s [id=sgrule-2917024315]"
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_from_master_udp: Creating..."
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_udp_from_worker: Creation complete after 4s [id=sgrule-3994945798]"
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_geneve_from_worker: Creating..."
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.worker_ingress_internal_from_master_udp: Creation complete after 1s [id=sgrule-3158776489]"
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_etcd: Creating..."
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_geneve: Creation complete after 4s [id=sgrule-3946942169]"
+ time="2022-04-15T03:12:37Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_tcp: Creating..."
+ time="2022-04-15T03:12:38Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike_nat_t: Creation complete after 5s [id=sgrule-3695976269]"
+ time="2022-04-15T03:12:38Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ovndb_from_worker: Creating..."
+ time="2022-04-15T03:12:39Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ike: Creation complete after 4s [id=sgrule-157885009]"
+ time="2022-04-15T03:12:39Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_from_worker_udp: Creating..."
+ time="2022-04-15T03:12:39Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_from_worker: Creation complete after 3s [id=sgrule-439047006]"
+ time="2022-04-15T03:12:39Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_esp: Creating..."
+ time="2022-04-15T03:12:40Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_geneve_from_worker: Creation complete after 4s [id=sgrule-3804035592]"
+ time="2022-04-15T03:12:40Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_controller_manager: Creating..."
+ time="2022-04-15T03:12:41Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_etcd: Creation complete after 3s [id=sgrule-3806990615]"
+ time="2022-04-15T03:12:41Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ssh: Creating..."
+ time="2022-04-15T03:12:41Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_services_tcp: Creation complete after 4s [id=sgrule-1136451128]"
+ time="2022-04-15T03:12:41Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_scheduler: Creating..."
+ time="2022-04-15T03:12:42Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ovndb_from_worker: Creation complete after 4s [id=sgrule-2731656321]"
+ time="2022-04-15T03:12:42Z" level=debug msg="module.masters.aws_network_interface.master[1]: Creating..."
+ time="2022-04-15T03:12:43Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_internal_from_worker_udp: Creation complete after 4s [id=sgrule-3195334833]"
+ time="2022-04-15T03:12:43Z" level=debug msg="module.masters.aws_network_interface.master[0]: Creating..."
+ time="2022-04-15T03:12:44Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_esp: Creation complete after 4s [id=sgrule-55145769]"
+ time="2022-04-15T03:12:44Z" level=debug msg="module.masters.aws_network_interface.master[2]: Creating..."
+ time="2022-04-15T03:12:44Z" level=debug msg="module.masters.aws_network_interface.master[1]: Creation complete after 1s [id=eni-042c39486a3044949]"
+ time="2022-04-15T03:12:44Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.masters.aws_network_interface.master[0]: Creation complete after 2s [id=eni-06cd511b6151ab416]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [30s elapsed]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_controller_manager: Creation complete after 5s [id=sgrule-766454480]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.masters.aws_network_interface.master[2]: Creation complete after 2s [id=eni-035d454868d0a95c0]"
+ time="2022-04-15T03:12:45Z" level=debug msg="module.masters.aws_instance.master[0]: Creating..."
+ time="2022-04-15T03:12:45Z" level=debug msg="module.masters.aws_instance.master[1]: Creating..."
+ time="2022-04-15T03:12:45Z" level=debug msg="module.masters.aws_instance.master[2]: Creating..."
+ time="2022-04-15T03:12:46Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_ssh: Creation complete after 5s [id=sgrule-1313188770]"
+ time="2022-04-15T03:12:46Z" level=debug msg="module.vpc.aws_security_group_rule.master_ingress_kube_scheduler: Creation complete after 5s [id=sgrule-3978514003]"
+ time="2022-04-15T03:12:54Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Still creating... [40s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [40s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [40s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [40s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.masters.aws_instance.master[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.masters.aws_instance.master[1]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:12:55Z" level=debug msg="module.masters.aws_instance.master[2]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:13:01Z" level=debug msg="module.dns.aws_route53_zone.new_int[0]: Creation complete after 47s [id=Z0065989R3EI9CX6MS6K]"
+ time="2022-04-15T03:13:01Z" level=debug msg="module.dns.data.aws_route53_zone.int: Reading..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.dns.data.aws_route53_zone.int: Read complete after 1s [id=Z0065989R3EI9CX6MS6K]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_instance.master[0]: Creation complete after 16s [id=i-04a744ce0b625c454]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_instance.master[1]: Creation complete after 16s [id=i-0dba9ca2b6f5d1fbc]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_instance.master[2]: Creation complete after 16s [id=i-07c8c8185dfd18dde]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[1]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[0]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[2]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[3]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[4]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[8]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[5]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[3]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1-20220415031302376900000004]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[6]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[2]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a-20220415031302389100000005]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[7]: Creating..."
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[1]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e-20220415031302400500000006]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[8]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a-20220415031302421400000007]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[4]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e-20220415031302440100000008]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[0]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1-20220415031302456600000009]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[5]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a-2022041503130247020000000a]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[7]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e-2022041503130256390000000b]"
+ time="2022-04-15T03:13:02Z" level=debug msg="module.masters.aws_lb_target_group_attachment.master[6]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1-2022041503130265300000000c]"
+ time="2022-04-15T03:13:05Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [50s elapsed]"
+ time="2022-04-15T03:13:05Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [50s elapsed]"
+ time="2022-04-15T03:13:05Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [50s elapsed]"
+ time="2022-04-15T03:13:15Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m0s elapsed]"
+ time="2022-04-15T03:13:15Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [1m0s elapsed]"
+ time="2022-04-15T03:13:15Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m0s elapsed]"
+ time="2022-04-15T03:13:25Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m10s elapsed]"
+ time="2022-04-15T03:13:25Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [1m10s elapsed]"
+ time="2022-04-15T03:13:25Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m10s elapsed]"
+ time="2022-04-15T03:13:35Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m20s elapsed]"
+ time="2022-04-15T03:13:35Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [1m20s elapsed]"
+ time="2022-04-15T03:13:35Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m20s elapsed]"
+ time="2022-04-15T03:13:45Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m30s elapsed]"
+ time="2022-04-15T03:13:45Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Still creating... [1m30s elapsed]"
+ time="2022-04-15T03:13:45Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m30s elapsed]"
+ time="2022-04-15T03:13:49Z" level=debug msg="module.vpc.aws_nat_gateway.nat_gw[0]: Creation complete after 1m34s [id=nat-0988e750c5ee35120]"
+ time="2022-04-15T03:13:49Z" level=debug msg="module.vpc.aws_route.to_nat_gw[0]: Creating..."
+ time="2022-04-15T03:13:50Z" level=debug msg="module.vpc.aws_route.to_nat_gw[0]: Creation complete after 1s [id=r-rtb-051a3c59e69b8c89e1080289494]"
+ time="2022-04-15T03:13:55Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m40s elapsed]"
+ time="2022-04-15T03:13:55Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m40s elapsed]"
+ time="2022-04-15T03:14:05Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [1m50s elapsed]"
+ time="2022-04-15T03:14:05Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [1m50s elapsed]"
+ time="2022-04-15T03:14:15Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [2m0s elapsed]"
+ time="2022-04-15T03:14:15Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [2m0s elapsed]"
+ time="2022-04-15T03:14:25Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [2m10s elapsed]"
+ time="2022-04-15T03:14:25Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [2m10s elapsed]"
+ time="2022-04-15T03:14:35Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [2m20s elapsed]"
+ time="2022-04-15T03:14:35Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [2m20s elapsed]"
+ time="2022-04-15T03:14:45Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Still creating... [2m30s elapsed]"
+ time="2022-04-15T03:14:45Z" level=debug msg="module.vpc.aws_lb.api_internal: Still creating... [2m30s elapsed]"
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb.api_external[0]: Creation complete after 2m32s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:loadbalancer/net/fusion-sds-cns-jwnmv-ext/8c02238f4c0944e5]"
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb_listener.api_external_api[0]: Creating..."
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb.api_internal: Creation complete after 2m31s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:loadbalancer/net/fusion-sds-cns-jwnmv-int/c3c94ac2d94cb44f]"
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb_listener.api_internal_api: Creating..."
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb_listener.api_internal_services: Creating..."
+ time="2022-04-15T03:14:46Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Creating..."
+ time="2022-04-15T03:14:46Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Creating..."
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb_listener.api_external_api[0]: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:listener/net/fusion-sds-cns-jwnmv-ext/8c02238f4c0944e5/1af744957c5bfd34]"
+ time="2022-04-15T03:14:46Z" level=debug msg="module.vpc.aws_lb_listener.api_internal_api: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:listener/net/fusion-sds-cns-jwnmv-int/c3c94ac2d94cb44f/ef9269717419044d]"
+ time="2022-04-15T03:14:47Z" level=debug msg="module.vpc.aws_lb_listener.api_internal_services: Creation complete after 0s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:listener/net/fusion-sds-cns-jwnmv-int/c3c94ac2d94cb44f/977d3034f8050b83]"
+ time="2022-04-15T03:14:56Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:14:56Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:15:06Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:15:06Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:15:16Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:15:16Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:15:26Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Still creating... [40s elapsed]"
+ time="2022-04-15T03:15:26Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Still creating... [40s elapsed]"
+ time="2022-04-15T03:15:33Z" level=debug msg="module.dns.aws_route53_record.api_external_internal_zone_alias[0]: Creation complete after 46s [id=Z0065989R3EI9CX6MS6K_api.fusion-sds-cns.guu8.p1.openshiftapps.com_A]"
+ time="2022-04-15T03:15:33Z" level=debug msg="module.dns.data.aws_route53_zone.public[0]: Reading..."
+ time="2022-04-15T03:15:33Z" level=debug msg="module.dns.aws_route53_record.api_internal_alias[0]: Creation complete after 46s [id=Z0065989R3EI9CX6MS6K_api-int.fusion-sds-cns.guu8.p1.openshiftapps.com_A]"
+ time="2022-04-15T03:15:33Z" level=debug msg="module.dns.data.aws_route53_zone.public[0]: Read complete after 1s [id=Z0552120209RXRV8OSFXO]"
+ time="2022-04-15T03:15:33Z" level=debug msg="module.dns.aws_route53_record.api_external_alias[0]: Creating..."
+ time="2022-04-15T03:15:43Z" level=debug msg="module.dns.aws_route53_record.api_external_alias[0]: Still creating... [10s elapsed]"
+ time="2022-04-15T03:15:53Z" level=debug msg="module.dns.aws_route53_record.api_external_alias[0]: Still creating... [20s elapsed]"
+ time="2022-04-15T03:16:03Z" level=debug msg="module.dns.aws_route53_record.api_external_alias[0]: Still creating... [30s elapsed]"
+ time="2022-04-15T03:16:04Z" level=debug msg="module.dns.aws_route53_record.api_external_alias[0]: Creation complete after 31s [id=Z0552120209RXRV8OSFXO_api.fusion-sds-cns.guu8.p1.openshiftapps.com_A]"
+ time="2022-04-15T03:16:04Z" level=debug
+ time="2022-04-15T03:16:04Z" level=debug msg="Apply complete! Resources: 102 added, 0 changed, 0 destroyed."
+ time="2022-04-15T03:16:04Z" level=debug
+ time="2022-04-15T03:16:04Z" level=debug msg="Outputs:"
+ time="2022-04-15T03:16:04Z" level=debug
+ time="2022-04-15T03:16:04Z" level=debug msg="ami_id = \"ami-0efc96a4e17e7b048\""
+ time="2022-04-15T03:16:04Z" level=debug msg="control_plane_ips = ["
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"10.0.189.120\","
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"10.0.161.83\","
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"10.0.149.174\","
+ time="2022-04-15T03:16:04Z" level=debug msg="]"
+ time="2022-04-15T03:16:04Z" level=debug msg="lb_target_group_arns = tolist(["
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1\","
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e\","
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a\","
+ time="2022-04-15T03:16:04Z" level=debug msg="])"
+ time="2022-04-15T03:16:04Z" level=debug msg="lb_target_group_arns_length = \"3\""
+ time="2022-04-15T03:16:04Z" level=debug msg="master_sg_id = \"sg-06485904f1e0836ca\""
+ time="2022-04-15T03:16:04Z" level=debug msg="private_subnet_ids = ["
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"subnet-04f3764dee50b5111\","
+ time="2022-04-15T03:16:04Z" level=debug msg="]"
+ time="2022-04-15T03:16:04Z" level=debug msg="public_subnet_ids = ["
+ time="2022-04-15T03:16:04Z" level=debug msg="  \"subnet-098e53d6d909e8e67\","
+ time="2022-04-15T03:16:04Z" level=debug msg="]"
+ time="2022-04-15T03:16:04Z" level=debug msg="vpc_id = \"vpc-080c75db6b0053960\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-alicloud src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/alicloud/1.0.0/linux_amd64/terraform-provider-alicloud\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-aws src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/aws/1.0.0/linux_amd64/terraform-provider-aws\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-google src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/google/1.0.0/linux_amd64/terraform-provider-google\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-vsphereprivate src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/vsphereprivate/1.0.0/linux_amd64/terraform-provider-vsphereprivate\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-azurerm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/azurerm/1.0.0/linux_amd64/terraform-provider-azurerm\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-azurestack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/azurestack/1.0.0/linux_amd64/terraform-provider-azurestack\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-ignition src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/ignition/1.0.0/linux_amd64/terraform-provider-ignition\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-openstack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/openstack/1.0.0/linux_amd64/terraform-provider-openstack\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-random src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/random/1.0.0/linux_amd64/terraform-provider-random\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-ibm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/ibm/1.0.0/linux_amd64/terraform-provider-ibm\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-local src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/local/1.0.0/linux_amd64/terraform-provider-local\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-ovirt src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/ovirt/1.0.0/linux_amd64/terraform-provider-ovirt\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-vsphere src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/vsphere/1.0.0/linux_amd64/terraform-provider-vsphere\""
+ time="2022-04-15T03:16:04Z" level=debug msg="Symlinking plugin terraform-provider-azureprivatedns src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-714202276/plugins/openshift/local/azureprivatedns/1.0.0/linux_amd64/terraform-provider-azureprivatedns\""
+ time="2022-04-15T03:16:04Z" level=debug
+ time="2022-04-15T03:16:04Z" level=debug msg="Initializing the backend..."
+ time="2022-04-15T03:16:04Z" level=debug
+ time="2022-04-15T03:16:04Z" level=debug msg="Initializing provider plugins..."
+ time="2022-04-15T03:16:04Z" level=debug msg="- Finding latest version of openshift/local/aws..."
+ time="2022-04-15T03:16:04Z" level=debug msg="- Installing openshift/local/aws v1.0.0..."
+ time="2022-04-15T03:16:06Z" level=debug msg="- Installed openshift/local/aws v1.0.0 (unauthenticated)"
+ time="2022-04-15T03:16:06Z" level=debug
+ time="2022-04-15T03:16:06Z" level=debug msg="Terraform has created a lock file .terraform.lock.hcl to record the provider"
+ time="2022-04-15T03:16:06Z" level=debug msg="selections it made above. Include this file in your version control repository"
+ time="2022-04-15T03:16:06Z" level=debug msg="so that Terraform can guarantee to make the same selections by default when"
+ time="2022-04-15T03:16:06Z" level=debug msg="you run \"terraform init\" in the future."
+ time="2022-04-15T03:16:06Z" level=debug
+ time="2022-04-15T03:16:06Z" level=debug msg="Terraform has been successfully initialized!"
+ time="2022-04-15T03:16:06Z" level=debug
+ time="2022-04-15T03:16:06Z" level=debug msg="You may now begin working with Terraform. Try running \"terraform plan\" to see"
+ time="2022-04-15T03:16:06Z" level=debug msg="any changes that are required for your infrastructure. All Terraform commands"
+ time="2022-04-15T03:16:06Z" level=debug msg="should now work."
+ time="2022-04-15T03:16:06Z" level=debug
+ time="2022-04-15T03:16:06Z" level=debug msg="If you ever set or change modules or backend configuration for Terraform,"
+ time="2022-04-15T03:16:06Z" level=debug msg="rerun this command to reinitialize your working directory. If you forget, other"
+ time="2022-04-15T03:16:06Z" level=debug msg="commands will detect it and remind you to do so if necessary."
+ time="2022-04-15T03:16:10Z" level=debug msg="aws_iam_instance_profile.bootstrap: Creating..."
+ time="2022-04-15T03:16:10Z" level=debug msg="aws_security_group.bootstrap: Creating..."
+ time="2022-04-15T03:16:10Z" level=debug msg="aws_s3_bucket.ignition: Creating..."
+ time="2022-04-15T03:16:10Z" level=debug msg="aws_iam_instance_profile.bootstrap: Creation complete after 0s [id=fusion-sds-cns-jwnmv-bootstrap-profile]"
+ time="2022-04-15T03:16:11Z" level=debug msg="aws_s3_bucket.ignition: Creation complete after 1s [id=fusion-sds-cns-jwnmv-bootstrap]"
+ time="2022-04-15T03:16:11Z" level=debug msg="aws_s3_bucket_object.ignition: Creating..."
+ time="2022-04-15T03:16:11Z" level=debug msg="aws_s3_bucket_object.ignition: Creation complete after 0s [id=bootstrap.ign]"
+ time="2022-04-15T03:16:12Z" level=debug msg="aws_security_group.bootstrap: Creation complete after 2s [id=sg-0b89c43259f390926]"
+ time="2022-04-15T03:16:12Z" level=debug msg="aws_security_group_rule.ssh: Creating..."
+ time="2022-04-15T03:16:12Z" level=debug msg="aws_security_group_rule.bootstrap_journald_gateway: Creating..."
+ time="2022-04-15T03:16:12Z" level=debug msg="aws_instance.bootstrap: Creating..."
+ time="2022-04-15T03:16:13Z" level=debug msg="aws_security_group_rule.bootstrap_journald_gateway: Creation complete after 1s [id=sgrule-2060342197]"
+ time="2022-04-15T03:16:14Z" level=debug msg="aws_security_group_rule.ssh: Creation complete after 2s [id=sgrule-2426356712]"
+ time="2022-04-15T03:16:22Z" level=debug msg="aws_instance.bootstrap: Still creating... [10s elapsed]"
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_instance.bootstrap: Creation complete after 18s [id=i-09bb852a16f57b62e]"
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[0]: Creating..."
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[2]: Creating..."
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[1]: Creating..."
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[2]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a-20220415031631734800000002]"
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[1]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e-20220415031631742300000003]"
+ time="2022-04-15T03:16:31Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[0]: Creation complete after 1s [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1-20220415031631819700000004]"
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="Warning: Value for undeclared variable"
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="The root module does not declare a variable named \"control_plane_ips\" but a"
+ time="2022-04-15T03:16:31Z" level=debug msg="value was found in file"
+ time="2022-04-15T03:16:31Z" level=debug msg="\"/tmp/openshift-install-bootstrap-714202276/cluster.tfvars.json\". To use this"
+ time="2022-04-15T03:16:31Z" level=debug msg="value, add a \"variable\" block to the configuration."
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="Using a variables file to set an undeclared variable is deprecated and will"
+ time="2022-04-15T03:16:31Z" level=debug msg="become an error in a future release. If you wish to provide certain \"global\""
+ time="2022-04-15T03:16:31Z" level=debug msg="settings to all configurations in your organization, use TF_VAR_..."
+ time="2022-04-15T03:16:31Z" level=debug msg="environment variables to set these instead."
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="Apply complete! Resources: 10 added, 0 changed, 0 destroyed."
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="Outputs:"
+ time="2022-04-15T03:16:31Z" level=debug
+ time="2022-04-15T03:16:31Z" level=debug msg="bootstrap_ip = \"44.199.202.140\""
+ time="2022-04-15T03:16:31Z" level=debug msg="OpenShift Installer v4.10.0"
+ time="2022-04-15T03:16:31Z" level=debug msg="Built from commit 17c2fe7527e96e250e442a15727f7558b2fb8899"
+ time="2022-04-15T03:16:31Z" level=info msg="Waiting up to 20m0s (until 3:36AM) for the Kubernetes API at https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443..."
+ time="2022-04-15T03:16:31Z" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443/version\": dial tcp 18.214.85.106:6443: connect: connection refused"
+ | time="2022-04-15T03:17:01Z" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443/version\": dial tcp 18.214.85.106:6443: connect: connection refused"
+ / time="2022-04-15T03:17:32Z" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443/version\": dial tcp 18.214.85.106:6443: connect: connection refused"
+ - time="2022-04-15T03:18:02Z" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443/version\": dial tcp 18.214.85.106:6443: connect: connection refused"
+ / time="2022-04-15T03:18:32Z" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443/version\": dial tcp 18.214.85.106:6443: connect: connection refused"
+ | time="2022-04-15T03:19:02Z" level=info msg="API v1.23.5+b0357ed up"
+ time="2022-04-15T03:19:02Z" level=info msg="Waiting up to 30m0s (until 3:49AM) for bootstrapping to complete..."
+ \ time="2022-04-15T03:26:44Z" level=debug msg="Bootstrap status: complete"
+ time="2022-04-15T03:26:44Z" level=info msg="Destroying the bootstrap resources..."
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-azureprivatedns src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/azureprivatedns/1.0.0/linux_amd64/terraform-provider-azureprivatedns\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-alicloud src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/alicloud/1.0.0/linux_amd64/terraform-provider-alicloud\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-aws src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/aws/1.0.0/linux_amd64/terraform-provider-aws\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-google src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/google/1.0.0/linux_amd64/terraform-provider-google\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-azurerm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/azurerm/1.0.0/linux_amd64/terraform-provider-azurerm\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-azurestack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/azurestack/1.0.0/linux_amd64/terraform-provider-azurestack\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-ignition src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/ignition/1.0.0/linux_amd64/terraform-provider-ignition\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-openstack src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/openstack/1.0.0/linux_amd64/terraform-provider-openstack\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-random src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/random/1.0.0/linux_amd64/terraform-provider-random\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-vsphereprivate src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/vsphereprivate/1.0.0/linux_amd64/terraform-provider-vsphereprivate\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-ibm src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/ibm/1.0.0/linux_amd64/terraform-provider-ibm\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-local src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/local/1.0.0/linux_amd64/terraform-provider-local\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-ovirt src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/ovirt/1.0.0/linux_amd64/terraform-provider-ovirt\""
+ time="2022-04-15T03:26:44Z" level=debug msg="Symlinking plugin terraform-provider-vsphere src: \"/home/hive/openshift-install\" dst: \"/tmp/openshift-install-bootstrap-3350700402/plugins/openshift/local/vsphere/1.0.0/linux_amd64/terraform-provider-vsphere\""
+ time="2022-04-15T03:26:44Z" level=debug
+ time="2022-04-15T03:26:44Z" level=debug msg="Initializing the backend..."
+ time="2022-04-15T03:26:44Z" level=debug
+ time="2022-04-15T03:26:44Z" level=debug msg="Initializing provider plugins..."
+ time="2022-04-15T03:26:44Z" level=debug msg="- Finding latest version of openshift/local/aws..."
+ time="2022-04-15T03:26:44Z" level=debug msg="- Installing openshift/local/aws v1.0.0..."
+ time="2022-04-15T03:26:46Z" level=debug msg="- Installed openshift/local/aws v1.0.0 (unauthenticated)"
+ time="2022-04-15T03:26:46Z" level=debug
+ time="2022-04-15T03:26:46Z" level=debug msg="Terraform has created a lock file .terraform.lock.hcl to record the provider"
+ time="2022-04-15T03:26:46Z" level=debug msg="selections it made above. Include this file in your version control repository"
+ time="2022-04-15T03:26:46Z" level=debug msg="so that Terraform can guarantee to make the same selections by default when"
+ time="2022-04-15T03:26:46Z" level=debug msg="you run \"terraform init\" in the future."
+ time="2022-04-15T03:26:46Z" level=debug
+ time="2022-04-15T03:26:46Z" level=debug msg="Terraform has been successfully initialized!"
+ time="2022-04-15T03:26:46Z" level=debug
+ time="2022-04-15T03:26:46Z" level=debug msg="You may now begin working with Terraform. Try running \"terraform plan\" to see"
+ time="2022-04-15T03:26:46Z" level=debug msg="any changes that are required for your infrastructure. All Terraform commands"
+ time="2022-04-15T03:26:46Z" level=debug msg="should now work."
+ time="2022-04-15T03:26:46Z" level=debug
+ time="2022-04-15T03:26:46Z" level=debug msg="If you ever set or change modules or backend configuration for Terraform,"
+ time="2022-04-15T03:26:46Z" level=debug msg="rerun this command to reinitialize your working directory. If you forget, other"
+ time="2022-04-15T03:26:46Z" level=debug msg="commands will detect it and remind you to do so if necessary."
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_security_group_rule.bootstrap_journald_gateway: Destroying... [id=sgrule-2060342197]"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[0]: Destroying... [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aint/b9b2cf7f4faedba1-20220415031631819700000004]"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_security_group_rule.ssh: Destroying... [id=sgrule-2426356712]"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[2]: Destroying... [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-aext/ebc0674572336d6a-20220415031631734800000002]"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[1]: Destroying... [id=arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jwnmv-sint/05b785201412a56e-20220415031631742300000003]"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[1]: Destruction complete after 0s"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[2]: Destruction complete after 0s"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_lb_target_group_attachment.bootstrap[0]: Destruction complete after 0s"
+ time="2022-04-15T03:26:49Z" level=debug msg="aws_instance.bootstrap: Destroying... [id=i-09bb852a16f57b62e]"
+ time="2022-04-15T03:26:50Z" level=debug msg="aws_security_group_rule.bootstrap_journald_gateway: Destruction complete after 0s"
+ time="2022-04-15T03:26:50Z" level=debug msg="aws_security_group_rule.ssh: Destruction complete after 1s"
+ time="2022-04-15T03:26:59Z" level=debug msg="aws_instance.bootstrap: Still destroying... [id=i-09bb852a16f57b62e, 10s elapsed]"
+ time="2022-04-15T03:27:09Z" level=debug msg="aws_instance.bootstrap: Still destroying... [id=i-09bb852a16f57b62e, 20s elapsed]"
+ time="2022-04-15T03:27:19Z" level=debug msg="aws_instance.bootstrap: Still destroying... [id=i-09bb852a16f57b62e, 30s elapsed]"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_instance.bootstrap: Destruction complete after 40s"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_iam_instance_profile.bootstrap: Destroying... [id=fusion-sds-cns-jwnmv-bootstrap-profile]"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_security_group.bootstrap: Destroying... [id=sg-0b89c43259f390926]"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_s3_bucket_object.ignition: Destroying... [id=bootstrap.ign]"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_s3_bucket_object.ignition: Destruction complete after 0s"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_s3_bucket.ignition: Destroying... [id=fusion-sds-cns-jwnmv-bootstrap]"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_iam_instance_profile.bootstrap: Destruction complete after 0s"
+ time="2022-04-15T03:27:29Z" level=debug msg="aws_s3_bucket.ignition: Destruction complete after 0s"
+ time="2022-04-15T03:27:30Z" level=debug msg="aws_security_group.bootstrap: Destruction complete after 0s"
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="Warning: Value for undeclared variable"
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="The root module does not declare a variable named \"control_plane_ips\" but a"
+ time="2022-04-15T03:27:30Z" level=debug msg="value was found in file"
+ time="2022-04-15T03:27:30Z" level=debug msg="\"/tmp/openshift-install-bootstrap-3350700402/cluster.tfvars.json\". To use this"
+ time="2022-04-15T03:27:30Z" level=debug msg="value, add a \"variable\" block to the configuration."
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="Using a variables file to set an undeclared variable is deprecated and will"
+ time="2022-04-15T03:27:30Z" level=debug msg="become an error in a future release. If you wish to provide certain \"global\""
+ time="2022-04-15T03:27:30Z" level=debug msg="settings to all configurations in your organization, use TF_VAR_..."
+ time="2022-04-15T03:27:30Z" level=debug msg="environment variables to set these instead."
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="Warning: Value for undeclared variable"
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="The root module does not declare a variable named \"bootstrap_ip\" but a value"
+ time="2022-04-15T03:27:30Z" level=debug msg="was found in file"
+ time="2022-04-15T03:27:30Z" level=debug msg="\"/tmp/openshift-install-bootstrap-3350700402/bootstrap.tfvars.json\". To use"
+ time="2022-04-15T03:27:30Z" level=debug msg="this value, add a \"variable\" block to the configuration."
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="Using a variables file to set an undeclared variable is deprecated and will"
+ time="2022-04-15T03:27:30Z" level=debug msg="become an error in a future release. If you wish to provide certain \"global\""
+ time="2022-04-15T03:27:30Z" level=debug msg="settings to all configurations in your organization, use TF_VAR_..."
+ time="2022-04-15T03:27:30Z" level=debug msg="environment variables to set these instead."
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug
+ time="2022-04-15T03:27:30Z" level=debug msg="Destroy complete! Resources: 10 destroyed."
+ time="2022-04-15T03:27:30Z" level=debug msg="Loading Install Config..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading SSH Key..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading Base Domain..."
+ time="2022-04-15T03:27:30Z" level=debug msg="    Loading Platform..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading Cluster Name..."
+ time="2022-04-15T03:27:30Z" level=debug msg="    Loading Base Domain..."
+ time="2022-04-15T03:27:30Z" level=debug msg="    Loading Platform..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading Networking..."
+ time="2022-04-15T03:27:30Z" level=debug msg="    Loading Platform..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading Pull Secret..."
+ time="2022-04-15T03:27:30Z" level=debug msg="  Loading Platform..."
+ time="2022-04-15T03:27:30Z" level=debug msg="Using Install Config loaded from state file"
+ time="2022-04-15T03:27:30Z" level=info msg="Waiting up to 40m0s (until 4:07AM) for the cluster at https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443 to initialize..."
+ time="2022-04-15T03:27:30Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 671 of 771 done (87% complete)"
+ - time="2022-04-15T03:29:02Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 671 of 771 done (87% complete)"
+ | time="2022-04-15T03:31:42Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 671 of 771 done (87% complete)"
+ | time="2022-04-15T03:36:07Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6"
+ time="2022-04-15T03:36:07Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: downloading update"
+ time="2022-04-15T03:36:07Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: downloading update"
+ time="2022-04-15T03:36:08Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6"
+ time="2022-04-15T03:36:23Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 586 of 771 done (76% complete)"
+ time="2022-04-15T03:36:38Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 750 of 771 done (97% complete)"
+ | time="2022-04-15T03:37:08Z" level=debug msg="Still waiting for the cluster to initialize: Working towards 4.10.6: 765 of 771 done (99% complete)"
+ | time="2022-04-15T03:39:38Z" level=debug msg="Still waiting for the cluster to initialize: Cluster operator authentication is not available"
+ time="2022-04-15T03:39:38Z" level=debug msg="Still waiting for the cluster to initialize: Cluster operator authentication is not available"
+ time="2022-04-15T03:39:38Z" level=debug msg="Still waiting for the cluster to initialize: Cluster operator authentication is not available"
+ time="2022-04-15T03:39:38Z" level=debug msg="Still waiting for the cluster to initialize: Cluster operator authentication is not available"
+ time="2022-04-15T03:40:23Z" level=debug msg="Cluster is initialized"
+ time="2022-04-15T03:40:23Z" level=info msg="Waiting up to 10m0s (until 3:50AM) for the openshift-console route to be created..."
+ time="2022-04-15T03:40:23Z" level=debug msg="Route found in openshift-console namespace: console"
+ time="2022-04-15T03:40:23Z" level=debug msg="OpenShift console route is admitted"
+ time="2022-04-15T03:40:23Z" level=info msg="Install complete!"
+ time="2022-04-15T03:40:23Z" level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/output/auth/kubeconfig'"
+ time="2022-04-15T03:40:23Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.fusion-sds-cns.guu8.p1.openshiftapps.com"
+ REDACTED LINE OF OUTPUT
+ time="2022-04-15T03:40:23Z" level=debug msg="Time elapsed per stage:"
+ time="2022-04-15T03:40:23Z" level=debug msg="           cluster: 4m10s"
+ time="2022-04-15T03:40:23Z" level=debug msg="         bootstrap: 27s"
+ time="2022-04-15T03:40:23Z" level=debug msg="Bootstrap Complete: 10m12s"
+ time="2022-04-15T03:40:23Z" level=debug msg="               API: 2m31s"
+ time="2022-04-15T03:40:23Z" level=debug msg=" Bootstrap Destroy: 46s"
+ time="2022-04-15T03:40:23Z" level=debug msg=" Cluster Operators: 12m53s"
+ time="2022-04-15T03:40:23Z" level=info msg="Time elapsed: 28m29s"
+ I: Cluster 'fusion-sds-cns' is now ready
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="create-users-for-cluster-access">Create users for cluster access</h2>
+
+<h3 id="creating-a-cluster-administrator-user">Creating a cluster administrator user</h3>
+
+<ul>
+  <li>
+    <p>Create a cluster administrator user</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa create admin --cluster=&lt;cluster_name&gt;
+
+Example:
+$ rosa create admin --cluster=fusion-sds-cns
+W: It is recommended to add an identity provider to login to this cluster. See 'rosa create idp --help' for more information.
+I: Admin account has been added to cluster 'fusion-sds-cns'.
+I: Please securely store this generated password. If you lose this password you can delete and recreate the cluster admin user.
+I: To login, run the following command:
+  
+   oc login https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443 --username cluster-admin --password muJet-UpYnQ-3RIer-ICCUq
+
+I: It may take up to a minute for the account to become active.
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Log in to the cluster through the <code class="language-plaintext highlighter-rouge">oc</code> CLI</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ oc login &lt;api_url&gt; --username cluster-admin --password &lt;cluster_admin_password&gt; 
+
+ Example:
+ $ oc login https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443 --username cluster-admin --password muJet-UpYnQ-3RIer-ICCUq
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="configuring-an-identity-provider">Configuring an identity provider</h3>
+
+<p>You can configure different identity provider types for your Red Hat OpenShift Service on AWS (ROSA) cluster. Supported types include GitHub, GitHub Enterprise, GitLab, Google, LDAP, OpenID Connect and HTPasswd identity providers.</p>
+
+<p>The following procedure configures a GitHub identity provider as an example.</p>
+
+<ul>
+  <li>
+    <p>Create a GitHub organization to use for identity provisioning for your ROSA cluster if not have. Follow the steps in the <a href="https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch" target="_blank">GitHub documentation</a>.</p>
+  </li>
+  <li>
+    <p>Configure a GitHub identity provider for your cluster that is restricted to the members of your GitHub organization.</p>
+  </li>
+  <li>
+    <p>Enter the following command to set up the GitHub IdP</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa create idp --cluster=&lt;cluster_name&gt; --interactive
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The above CLI will provide you with a link. Follow the URL in the output and select <strong>Register application</strong> to register a new OAuth application in your GitHub organization.</p>
+  </li>
+  <li>
+    <p>On the next page it will show you a “Client ID”. Copy this and paste it back into the terminal where it asks for “Client ID”.</p>
+  </li>
+  <li>
+    <p>The CLI now asks for a “Client Secret”. So go back in your browser and click on “Generate a new client secret” near the middle of the page towards the right.</p>
+  </li>
+  <li>
+    <p>Paste the secret into the terminal where the CLI is asking for the Client Secret and press enter.</p>
+  </li>
+  <li>
+    <p>Leave “GitHub Enterprise Hostname” blank.</p>
+  </li>
+  <li>
+    <p>Specify <code class="language-plaintext highlighter-rouge">claim</code> as the mapping method.</p>
+  </li>
+  <li>
+    <p>Then the IdP will be created but can take up to 1 minute for the configuration to land onto your cluster.</p>
+  </li>
+  <li>
+    <p>Verify that the identity provider has been configured correctly</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa list idps --cluster=&lt;cluster_name&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="granting-user-access-to-a-cluster">Granting user access to a cluster</h3>
+
+<h4 id="to-configure-cluster-admin-privileges-for-an-identity-provider-user">To configure <code class="language-plaintext highlighter-rouge">cluster-admin</code> privileges for an identity provider user</h4>
+
+<ul>
+  <li>
+    <p>Grant the user <code class="language-plaintext highlighter-rouge">cluster-admin</code> privileges</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa grant user cluster-admin --user=&lt;idp_user_name&gt; --cluster=&lt;cluster_name&gt; 
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify if the user is listed as a member of the <code class="language-plaintext highlighter-rouge">cluster-admins</code> group</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa list users --cluster=&lt;cluster_name&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="to-configure-dedicated-admin-privileges-for-an-identity-provider-user">To configure dedicated-admin privileges for an identity provider user</h4>
+
+<ul>
+  <li>
+    <p>Grant the user <code class="language-plaintext highlighter-rouge">dedicated-admin</code> privileges</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa grant user dedicated-admin --user=&lt;idp_user_name&gt; --cluster=&lt;cluster_name&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify if the user is listed as a member of the <code class="language-plaintext highlighter-rouge">dedicated-admins</code> group</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa list users --cluster=&lt;cluster_name&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="accessing-the-cluster">Accessing the cluster</h2>
+
+<h3 id="accessing-the-cluster-via-the-web-console">Accessing the cluster via the Web Console</h3>
+
+<ul>
+  <li>
+    <p>Obtain the console URL for your cluster</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa describe cluster -c &lt;cluster_name&gt; | grep Console 
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Go to the console URL in above output and use your IdP to login.</p>
+  </li>
+</ul>
+
+<h3 id="accessing-the-cluster-via-the-oc-cli">Accessing the cluster via the <code class="language-plaintext highlighter-rouge">oc</code> CLI</h3>
+
+<ul>
+  <li>
+    <p>Log into the web console as stated above</p>
+  </li>
+  <li>
+    <p>Click on “Copy Login Command” in the top right corner</p>
+  </li>
+  <li>
+    <p>A new tab will open, Click on “Display token”.</p>
+  </li>
+  <li>
+    <p>You will see a login with a token command in next page like below</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc login https://api.fusion-sds-cns.guu8.p1.openshiftapps.com:6443 --username cluster-admin --password muJet-UpYnQ-3RIer-ICCUq
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Copy and paste it into your terminal. Press enter then can login the cluster.</p>
+  </li>
+  <li>
+    <p>Then you can run <code class="language-plaintext highlighter-rouge">oc</code> CLI commands</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oc get node
+  
+Example:
+$ oc get node
+NAME                           STATUS                        ROLES          AGE     VERSION
+ip-10-0-149-174.ec2.internal   Ready                         master         31m     v1.23.5+b0357ed
+ip-10-0-155-223.ec2.internal   Ready                         infra,worker   9m44s   v1.23.5+b0357ed
+ip-10-0-161-83.ec2.internal    NotReady,SchedulingDisabled   master         31m     v1.23.5+b0357ed
+ip-10-0-168-243.ec2.internal   Ready                         worker         23m     v1.23.5+b0357ed
+ip-10-0-174-8.ec2.internal     Ready                         infra,worker   9m50s   v1.23.5+b0357ed
+ip-10-0-184-144.ec2.internal   Ready                         worker         23m     v1.23.5+b0357ed
+ip-10-0-189-120.ec2.internal   Ready                         master         31m     v1.23.5+b0357ed
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="deleting-a-rosa-cluster">Deleting a ROSA Cluster</h2>
+
+<p>If Red Hat OpenShift Service on AWS created a VPC, you must remove network configurations(such as VPN configurations and VPC peering connections) and Any additional services that were added to the VPC firstly.</p>
+
+<ul>
+  <li>
+    <p>List your clusters in order to ensure you are deleting the correct one</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ rosa list clusters
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Once you know which one to delete</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ rosa delete cluster --cluster=&lt;cluster_name&gt; --watch
+
+ Example:
+ $ rosa delete cluster --cluster=fusion-sds-cns --watch
+ ? Are you sure you want to delete cluster fusion-sds-cns? Yes
+ I: Cluster 'fusion-sds-cns' will start uninstalling now
+ I: Your cluster 'fusion-sds-cns' will be deleted but the following objects may remain
+ I: Operator IAM Roles: - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cloud-network-config-controller-cl
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-machine-api-aws-cloud-credentials
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cloud-credential-operator-cloud-cr
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-image-registry-installer-cloud-cre
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-ingress-operator-cloud-credentials
+  - arn:aws:iam::123926884296:role/fusion-sds-cns-n2l0-openshift-cluster-csi-drivers-ebs-cloud-cred
+   
+ I: OIDC Provider : https://rh-oidc.s3.us-east-1.amazonaws.com/1rir0e44l46sv8lmpmhrt7uullilf1aq
+   
+ I: Once the cluster is uninstalled use the following commands to remove the above aws resources.
+   
+ 	rosa delete operator-roles -c 1rir0e44l46sv8lmpmhrt7uullilf1aq
+ 	rosa delete oidc-provider -c 1rir0e44l46sv8lmpmhrt7uullilf1aq
+ time="2022-04-14T11:10:44Z" level=debug msg="Couldn't find install logs provider environment variable. Skipping."
+ time="2022-04-14T11:10:44Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:10:44Z" level=info msg="running file observer" files="[/etc/aws-creds/..2022_04_14_11_10_41.2706604505/aws_config]"
+ I0414 11:10:44.380927       1 observer_polling.go:159] Starting file observer
+ time="2022-04-14T11:10:44Z" level=debug msg="Couldn't find install logs provider environment variable. Skipping."
+ time="2022-04-14T11:10:45Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:10:45Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:10:46Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:10:46Z" level=debug msg="search for IAM instance profiles"
+ time="2022-04-14T11:10:46Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:10:46Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:10:46Z" level=info msg=Disassociated id=i-0470c5a70599b98e6 name=fusion-sds-cns-jc5ts-master-profile role=ManagedOpenShift-ControlPlane-Role
+ time="2022-04-14T11:10:47Z" level=info msg=Deleted InstanceProfileName=fusion-sds-cns-jc5ts-master-profile arn="arn:aws:iam::123926884296:instance-profile/fusion-sds-cns-jc5ts-master-profile" id=i-0470c5a70599b98e6
+ time="2022-04-14T11:10:47Z" level=debug msg=Terminating id=i-0470c5a70599b98e6
+ time="2022-04-14T11:10:47Z" level=debug msg=Terminating id=i-0d0ede3d7e7a24e65
+ time="2022-04-14T11:10:47Z" level=debug msg=Terminating id=i-0224337d634c1c1f2
+ time="2022-04-14T11:10:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:10:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:11:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:11:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:12:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:12:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:13:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:13:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:47Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:14:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:14:57Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:15:07Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:17Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:15:18Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:15:27Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:15:37Z" level=debug msg="search for instances by tag matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:37Z" level=debug msg="ResourceInUse: Target group 'arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jc5ts-sint/6f24a0be1962ce81' is currently in use by a listener or a rule\n\tstatus code: 400, request id: 0dc7c8ed-f9b4-42fd-83e8-0680310b62c7" arn="arn:aws:elasticloadbalancing:us-east-1:123926884296:targetgroup/fusion-sds-cns-jc5ts-sint/6f24a0be1962ce81"
+ time="2022-04-14T11:15:38Z" level=debug msg="AuthFailure: You do not have permission to access the specified resource.\n\tstatus code: 400, request id: d1318243-2fb2-4682-964c-ac5d48557bda" arn="arn:aws:ec2:us-east-1:123926884296:elastic-ip/eipalloc-0bc7e72724b39528e"
+ time="2022-04-14T11:15:39Z" level=info msg=Deleted id=eni-066711f5f91518131
+ time="2022-04-14T11:15:39Z" level=debug msg="DependencyViolation: The dhcpOptions 'dopt-0105f83d913490079' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 235a3e21-3bdf-4498-9ff0-afa039e1ab42" arn="arn:aws:ec2:us-east-1:123926884296:dhcp-options/dopt-0105f83d913490079"
+ time="2022-04-14T11:15:39Z" level=info msg=Deleted id=eni-04e4fdee4b90fde4f
+ time="2022-04-14T11:15:40Z" level=info msg=Deleted id=vpce-05b1757032f54537b
+ time="2022-04-14T11:15:40Z" level=debug msg="DependencyViolation: The subnet 'subnet-0625ec61d0bf0e512' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 22134a2a-8d80-4bc1-8f11-5f534d31f788" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-0625ec61d0bf0e512"
+ time="2022-04-14T11:15:40Z" level=debug msg="Revoked ingress permissions" id=sg-0f84b272e31d5d04d
+ time="2022-04-14T11:15:41Z" level=info msg=Deleted id=sg-0f84b272e31d5d04d
+ time="2022-04-14T11:15:41Z" level=info msg=Deleted id=eni-09b3dd9ee606adf88
+ time="2022-04-14T11:15:41Z" level=info msg=Disassociated id=rtbassoc-012c35705e5713a6c
+ time="2022-04-14T11:15:42Z" level=info msg=Deleted id=rtb-0f8739c8784b38294
+ time="2022-04-14T11:15:42Z" level=info msg=Deleted id=net/fusion-sds-cns-jc5ts-int/5e575ddceaa7f49d
+ time="2022-04-14T11:15:42Z" level=debug msg="listing AWS hosted zones \"fusion-sds-cns.dyje.p1.openshiftapps.com.\" (page 0)" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:42Z" level=debug msg="listing AWS hosted zones \"dyje.p1.openshiftapps.com.\" (page 0)" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:42Z" level=debug msg="listing AWS hosted zones \"p1.openshiftapps.com.\" (page 0)" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:42Z" level=debug msg="listing AWS hosted zones \"openshiftapps.com.\" (page 0)" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:42Z" level=debug msg="listing AWS hosted zones \"com.\" (page 0)" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:42Z" level=debug msg="shared public zone not found" id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:43Z" level=info msg=Deleted id=Z04539252F3HUOSPEDZH9 record set="A api-int.fusion-sds-cns.dyje.p1.openshiftapps.com."
+ time="2022-04-14T11:15:43Z" level=info msg=Deleted id=Z04539252F3HUOSPEDZH9 record set="A api.fusion-sds-cns.dyje.p1.openshiftapps.com."
+ time="2022-04-14T11:15:43Z" level=info msg=Deleted id=Z04539252F3HUOSPEDZH9
+ time="2022-04-14T11:15:43Z" level=info msg=Disassociated id=rtbassoc-015dec1bf11306dd4
+ time="2022-04-14T11:15:44Z" level=info msg=Deleted id=vpc-088805cd5415cfcff load balancer=loadbalancer/net/fusion-sds-cns-jc5ts-ext/56b2087ad89d85b2
+ time="2022-04-14T11:15:44Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:15:45Z" level=debug msg="deleting EC2 network interface eni-0bd6315a168270594: InvalidParameterValue: Network interface 'eni-0bd6315a168270594' is currently in use.\n\tstatus code: 400, request id: eba4032b-bd8e-4887-9ac0-e16a550231fc" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ time="2022-04-14T11:15:45Z" level=info msg=Deleted id=net/fusion-sds-cns-jc5ts-ext/56b2087ad89d85b2
+ time="2022-04-14T11:15:45Z" level=info msg=Deleted id=fusion-sds-cns-jc5ts-aint/0b83ea40ddaf0487
+ time="2022-04-14T11:15:45Z" level=info msg=Deleted id=fusion-sds-cns-jc5ts-aext/6a82365603365042
+ time="2022-04-14T11:15:46Z" level=debug msg="Revoked ingress permissions" id=sg-0b107241751183898
+ time="2022-04-14T11:15:46Z" level=debug msg="Revoked egress permissions" id=sg-0b107241751183898
+ time="2022-04-14T11:15:46Z" level=debug msg="DependencyViolation: resource sg-0b107241751183898 has a dependent object\n\tstatus code: 400, request id: f47fd8c3-2c56-4769-bb7e-17b53860d866" arn="arn:aws:ec2:us-east-1:123926884296:security-group/sg-0b107241751183898"
+ time="2022-04-14T11:15:47Z" level=debug msg="detaching from vpc-088805cd5415cfcff: DependencyViolation: Network vpc-088805cd5415cfcff has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.\n\tstatus code: 400, request id: e8bb5610-3b8c-4700-a4a3-4e84a72398a8" arn="arn:aws:ec2:us-east-1:123926884296:internet-gateway/igw-046f30fdf1c3c0292"
+ time="2022-04-14T11:15:47Z" level=debug msg="DependencyViolation: The subnet 'subnet-00df3c1a8282ba4f6' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: d961f9df-7818-4efd-8a14-7fc26f7a2ac8" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-00df3c1a8282ba4f6"
+ time="2022-04-14T11:15:48Z" level=debug msg="Revoked ingress permissions" id=sg-0fa51853668b17e4a
+ time="2022-04-14T11:15:48Z" level=debug msg="Revoked egress permissions" id=sg-0fa51853668b17e4a
+ time="2022-04-14T11:15:49Z" level=info msg=Deleted id=sg-0fa51853668b17e4a
+ time="2022-04-14T11:15:49Z" level=info msg=Deleted id=nat-002742cdfeacb9a80
+ time="2022-04-14T11:15:49Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:15:49Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:15:49Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:15:49Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:15:49Z" level=debug msg="search for IAM instance profiles"
+ time="2022-04-14T11:15:59Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:16:00Z" level=debug msg="deleting EC2 network interface eni-0bd6315a168270594: InvalidParameterValue: Network interface 'eni-0bd6315a168270594' is currently in use.\n\tstatus code: 400, request id: ccbc7e60-ad6b-4fc6-a72d-0675e6881cd4" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ time="2022-04-14T11:16:00Z" level=info msg=Deleted id=fusion-sds-cns-jc5ts-sint/6f24a0be1962ce81
+ time="2022-04-14T11:16:00Z" level=debug msg="DependencyViolation: The dhcpOptions 'dopt-0105f83d913490079' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: b0fdba90-fde3-4d4a-9612-1d6d9eedefb4" arn="arn:aws:ec2:us-east-1:123926884296:dhcp-options/dopt-0105f83d913490079"
+ time="2022-04-14T11:16:00Z" level=debug msg="DependencyViolation: The subnet 'subnet-0625ec61d0bf0e512' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 8343fff1-54e2-440d-b156-182d482cf492" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-0625ec61d0bf0e512"
+ time="2022-04-14T11:16:01Z" level=debug msg="AuthFailure: You do not have permission to access the specified resource.\n\tstatus code: 400, request id: 61e56a52-2632-4c33-8b24-095b29ef7444" arn="arn:aws:ec2:us-east-1:123926884296:elastic-ip/eipalloc-0bc7e72724b39528e"
+ time="2022-04-14T11:16:02Z" level=debug msg="detaching from vpc-088805cd5415cfcff: DependencyViolation: Network vpc-088805cd5415cfcff has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.\n\tstatus code: 400, request id: f92f226a-4f2c-479f-8dc8-4eb88e7f1657" arn="arn:aws:ec2:us-east-1:123926884296:internet-gateway/igw-046f30fdf1c3c0292"
+ time="2022-04-14T11:16:02Z" level=debug msg="DependencyViolation: The subnet 'subnet-00df3c1a8282ba4f6' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: c2439af4-29e3-4be7-b915-84afab4f8048" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-00df3c1a8282ba4f6"
+ time="2022-04-14T11:16:02Z" level=info msg=Deleted id=sg-0b107241751183898
+ time="2022-04-14T11:16:02Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:16:03Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:16:03Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:16:03Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:16:03Z" level=debug msg="search for IAM instance profiles"
+ \ time="2022-04-14T11:16:10Z" level=debug msg="AuthFailure: You do not have permission to access the specified resource.\n\tstatus code: 400, request id: 89554c73-31b2-4b4e-8c30-01c73813ab1b" arn="arn:aws:ec2:us-east-1:123926884296:elastic-ip/eipalloc-0bc7e72724b39528e"
+ time="2022-04-14T11:16:10Z" level=debug msg="detaching from vpc-088805cd5415cfcff: DependencyViolation: Network vpc-088805cd5415cfcff has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.\n\tstatus code: 400, request id: 1972bfce-2dc4-44e2-af96-5d1aef206233" arn="arn:aws:ec2:us-east-1:123926884296:internet-gateway/igw-046f30fdf1c3c0292"
+ time="2022-04-14T11:16:10Z" level=debug msg="DependencyViolation: The subnet 'subnet-00df3c1a8282ba4f6' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 9b63cd7f-3a1b-4be1-9fd4-99d08f856cf4" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-00df3c1a8282ba4f6"
+ time="2022-04-14T11:16:11Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:16:11Z" level=debug msg="deleting EC2 network interface eni-0bd6315a168270594: InvalidParameterValue: Network interface 'eni-0bd6315a168270594' is currently in use.\n\tstatus code: 400, request id: 579bf9b1-039d-4c65-8380-a2c8d84788d3" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ time="2022-04-14T11:16:12Z" level=debug msg="DependencyViolation: The dhcpOptions 'dopt-0105f83d913490079' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 0aee209e-0249-4876-bc8d-6ed242e6000d" arn="arn:aws:ec2:us-east-1:123926884296:dhcp-options/dopt-0105f83d913490079"
+ time="2022-04-14T11:16:12Z" level=debug msg="DependencyViolation: The subnet 'subnet-0625ec61d0bf0e512' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 38b4ddc0-fb6c-4d7a-8372-77a3c5ec1599" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-0625ec61d0bf0e512"
+ time="2022-04-14T11:16:12Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:16:12Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:16:12Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:16:12Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:16:12Z" level=debug msg="search for IAM instance profiles"
+ time="2022-04-14T11:16:19Z" level=debug msg="detaching from vpc-088805cd5415cfcff: DependencyViolation: Network vpc-088805cd5415cfcff has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.\n\tstatus code: 400, request id: 671e0517-2b18-4462-a512-ea62ccd13d70" arn="arn:aws:ec2:us-east-1:123926884296:internet-gateway/igw-046f30fdf1c3c0292"
+ time="2022-04-14T11:16:20Z" level=debug msg="DependencyViolation: The subnet 'subnet-00df3c1a8282ba4f6' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 35083b3f-854e-4621-8489-18fab4a70266" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-00df3c1a8282ba4f6"
+ time="2022-04-14T11:16:20Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:16:21Z" level=debug msg="deleting EC2 network interface eni-089887a53faf9158b: InvalidNetworkInterface.InUse: The network interface is currently in use.\n\tstatus code: 400, request id: 04f70fe0-7cce-4434-b719-dd117e57138b" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ time="2022-04-14T11:16:21Z" level=debug msg="DependencyViolation: The dhcpOptions 'dopt-0105f83d913490079' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 3506f39a-f0e5-4504-a2c3-da735ee88b17" arn="arn:aws:ec2:us-east-1:123926884296:dhcp-options/dopt-0105f83d913490079"
+ time="2022-04-14T11:16:21Z" level=debug msg="DependencyViolation: The subnet 'subnet-0625ec61d0bf0e512' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 133fdc46-d0ab-4a04-b861-e25f0f6978a7" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-0625ec61d0bf0e512"
+ time="2022-04-14T11:16:22Z" level=debug msg="AuthFailure: You do not have permission to access the specified resource.\n\tstatus code: 400, request id: 9dc3fb29-2933-451c-a7be-d5d6dbbee7c7" arn="arn:aws:ec2:us-east-1:123926884296:elastic-ip/eipalloc-0bc7e72724b39528e"
+ time="2022-04-14T11:16:22Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:16:22Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:16:22Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:16:22Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:16:22Z" level=debug msg="search for IAM instance profiles"
+ time="2022-04-14T11:16:30Z" level=debug msg="AuthFailure: You do not have permission to access the specified resource.\n\tstatus code: 400, request id: 78e94738-968f-45fb-a880-188fa396f3ff" arn="arn:aws:ec2:us-east-1:123926884296:elastic-ip/eipalloc-0bc7e72724b39528e"
+ time="2022-04-14T11:16:30Z" level=debug msg="detaching from vpc-088805cd5415cfcff: DependencyViolation: Network vpc-088805cd5415cfcff has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.\n\tstatus code: 400, request id: ecb3445c-abc9-48d9-8b3d-9950eb3f57e1" arn="arn:aws:ec2:us-east-1:123926884296:internet-gateway/igw-046f30fdf1c3c0292"
+ time="2022-04-14T11:16:31Z" level=debug msg="DependencyViolation: The subnet 'subnet-00df3c1a8282ba4f6' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 0e1c719f-716e-4e10-8f47-9648857b0a8e" arn="arn:aws:ec2:us-east-1:123926884296:subnet/subnet-00df3c1a8282ba4f6"
+ time="2022-04-14T11:16:31Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:16:31Z" level=debug msg="deleting EC2 network interface eni-089887a53faf9158b: InvalidNetworkInterface.InUse: The network interface is currently in use.\n\tstatus code: 400, request id: 570e2d87-3e28-4d41-8d39-0f01556b8c75" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ time="2022-04-14T11:16:32Z" level=debug msg="DependencyViolation: The dhcpOptions 'dopt-0105f83d913490079' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: 73825f66-ea1d-4a28-b8b3-9b69912c262e" arn="arn:aws:ec2:us-east-1:123926884296:dhcp-options/dopt-0105f83d913490079"
+ time="2022-04-14T11:16:32Z" level=info msg=Deleted id=subnet-0625ec61d0bf0e512
+ time="2022-04-14T11:16:32Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"kubernetes.io/cluster/fusion-sds-cns-jc5ts\":\"owned\"}"
+ time="2022-04-14T11:16:32Z" level=debug msg="search for matching resources by tag in us-east-1 matching aws.Filter{\"openshiftClusterID\":\"efbf386a-dcfc-454c-8310-d1d7f18cd4af\"}"
+ time="2022-04-14T11:16:32Z" level=debug msg="search for IAM roles"
+ time="2022-04-14T11:16:32Z" level=debug msg="search for IAM users"
+ time="2022-04-14T11:16:32Z" level=debug msg="search for IAM instance profiles"
+ time="2022-04-14T11:16:39Z" level=info msg=Deleted NAT gateway=nat-002742cdfeacb9a80 id=vpc-088805cd5415cfcff
+ time="2022-04-14T11:16:40Z" level=info msg=Deleted id=vpc-088805cd5415cfcff table=rtb-08aaff249ce8211e3
+ time="2022-04-14T11:16:41Z" level=debug msg="Revoked ingress permissions" id=vpc-088805cd5415cfcff security group=sg-0fde113207d87ed7a
+ time="2022-04-14T11:16:41Z" level=debug msg="Revoked egress permissions" id=vpc-088805cd5415cfcff security group=sg-0fde113207d87ed7a
+ time="2022-04-14T11:16:41Z" level=debug msg="Skipping default security group" id=vpc-088805cd5415cfcff security group=sg-0fde113207d87ed7a
+ time="2022-04-14T11:16:42Z" level=info msg=Deleted id=vpc-088805cd5415cfcff subnet=subnet-00df3c1a8282ba4f6
+ time="2022-04-14T11:16:42Z" level=debug msg="DependencyViolation: The vpc 'vpc-088805cd5415cfcff' has dependencies and cannot be deleted.\n\tstatus code: 400, request id: d67bdf22-8a3f-4c99-9417-8c483c5df0ec" arn="arn:aws:ec2:us-east-1:123926884296:vpc/vpc-088805cd5415cfcff"
+ - I: Cluster 'fusion-sds-cns' completed uninstallation
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Delete the OIDC provider that the cluster Operators use to authenticate</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa delete oidc-provider -c &lt;cluster_id&gt; --mode auto 
+
+Example:
+$ rosa delete oidc-provider -c 1rir0e44l46sv8lmpmhrt7uullilf1aq --mode auto
+? Delete the OIDC provider 'arn:aws:iam::123926884296:oidc-provider/rh-oidc.s3.us-east-1.amazonaws.com/1rir0e44l46sv8lmpmhrt7uullilf1aq'? Yes
+I: Successfully deleted the OIDC provider arn:aws:iam::123926884296:oidc-provider/rh-oidc.s3.us-east-1.amazonaws.com/1rir0e44l46sv8lmpmhrt7uullilf1aq
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Delete the cluster-specific Operator IAM roles</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rosa delete operator-roles -c &lt;cluster_id&gt; --mode auto
+
+Example:
+$ rosa delete operator-roles -c 1rir0e44l46sv8lmpmhrt7uullilf1aq --mode auto
+I: Fetching operator roles for the cluster: 1rir0e44l46sv8lmpmhrt7uullilf1aq
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-cloud-credential-operator-cloud-cr'? Yes
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-cloud-network-config-controller-cl'? Yes
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-cluster-csi-drivers-ebs-cloud-cred'? Yes
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-image-registry-installer-cloud-cre'? Yes
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-ingress-operator-cloud-credentials'? Yes
+? Delete the operator roles  'fusion-sds-cns-n2l0-openshift-machine-api-aws-cloud-credentials'? Yes
+I: Successfully deleted the operator roles
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Use the <a href="https://console.aws.amazon.com/iamv2/home#/roles" target="_blank">AWS IAM Console</a> to delete the account-wide roles which were created, such as with the prefix “ManagedOpenShift-“.</p>
+  </li>
+</ul>
+
+<h2 id="automatic-scripts">Automatic scripts</h2>
+
+<p>I have created scripts to auto operate above tasks, you can download them from <a href="https://github.ibm.com/ProjectAbell/fusion-runbooks/tree/main/managed-openshift/aws">here</a>.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://www.rosaworkshop.io/" target="_blank">ROSA workshop</a></li>
+  <li><a href="https://docs.openshift.com/rosa/rosa_getting_started/rosa-getting-started.html" target="_blank">Getting started with ROSA</a> from Red Hat website</li>
+  <li><a href="https://aws.amazon.com/rosa/" target="_blank">Red Hat OpenShift Service on AWS</a> from Amazon website</li>
+  <li><a href="https://shanna-chan.blog/2021/03/30/red-hat-openshift-on-amazon-is-ga/" target="_blank">Red Hat OpenShift on Amazon (ROSA) is GA!</a></li>
+  <li><a href="https://pages.github.ibm.com/ibm-aws/ibm-aws-saas-playbook/ROSA" target="_blank">AWS SaaS Build Playbook - ROSA</a></li>
+</ul>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/fusion" rel="tag"># fusion</a>
+          
+            
+            <a href="/tag/#/rosa" rel="tag"># rosa</a>
+          
+            
+            <a href="/tag/#/aws" rel="tag"># aws</a>
+          
+            
+            <a href="/tag/#/ocp" rel="tag"># ocp</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/troubleshoot/2022/07/30/Creating-ROSA-cluster-with-S3-bucket-limit-error/" rel="next" title="Creating ROSA cluster with S3 bucket limit error">
+                <i class="fa fa-chevron-left"></i> Creating ROSA cluster with S3 bucket limit error
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/troubleshoot/2022/03/03/ImageContentSourcePolicy-not-working-on-OCP/" rel="prev" title="ImageContentSourcePolicy didn't work on OCP 4.9">
+                ImageContentSourcePolicy didn't work on OCP 4.9 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/Bob.jpg"
+               alt="Bo Liu" />
+          <p class="site-author-name" itemprop="name">Bo Liu</p>
+           
+              <p class="site-description motion-element" itemprop="description">Memo on my positions on blue journey</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.ibm.com/lbosh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#prerequisites"> <span class="nav-number">1</span> <span class="nav-text">Prerequisites</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#setting-up-the-environment"> <span class="nav-number">2</span> <span class="nav-text">Setting up the environment</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#configure-the-aws-cli"> <span class="nav-number">2.1</span> <span class="nav-text">Configure the AWS CLI</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#configure-the-rosa-cli"> <span class="nav-number">2.2</span> <span class="nav-text">Configure the ROSA CLI</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#install-and-configure-the-latest-openshift-cli-oc"> <span class="nav-number">2.3</span> <span class="nav-text">Install and configure the latest OpenShift CLI (oc)</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#creating-the-elb-service-role"> <span class="nav-number">2.4</span> <span class="nav-text">Creating the ELB service role</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#verifying-aws-quota-availability"> <span class="nav-number">2.5</span> <span class="nav-text">Verifying AWS quota availability</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#creating-a-rosa-cluster-with-sts-using-the-default-options"> <span class="nav-number">3</span> <span class="nav-text">Creating a ROSA cluster with STS using the default options</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#create-the-required-account-wide-roles-and-policies-including-the-operator-policies"> <span class="nav-number">3.1</span> <span class="nav-text">Create the required account-wide roles and policies, including the Operator policies</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#create-a-cluster-with-sts-using-the-defaults"> <span class="nav-number">3.2</span> <span class="nav-text">Create a cluster with STS using the defaults</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#check-the-status-of-your-cluster"> <span class="nav-number">3.3</span> <span class="nav-text">Check the status of your cluster</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#track-the-progress-of-the-cluster-creation-by-watching-the-openshift-installer-logs"> <span class="nav-number">3.4</span> <span class="nav-text">Track the progress of the cluster creation by watching the OpenShift installer logs</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#create-users-for-cluster-access"> <span class="nav-number">4</span> <span class="nav-text">Create users for cluster access</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#creating-a-cluster-administrator-user"> <span class="nav-number">4.1</span> <span class="nav-text">Creating a cluster administrator user</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#configuring-an-identity-provider"> <span class="nav-number">4.2</span> <span class="nav-text">Configuring an identity provider</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#granting-user-access-to-a-cluster"> <span class="nav-number">4.3</span> <span class="nav-text">Granting user access to a cluster</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-4"> <a class="nav-link" href="#to-configure-cluster-admin-privileges-for-an-identity-provider-user"> <span class="nav-number">4.3.1</span> <span class="nav-text">To configure cluster-admin privileges for an identity provider user</span> </a> </li> <li class="nav-item nav-level-4"> <a class="nav-link" href="#to-configure-dedicated-admin-privileges-for-an-identity-provider-user"> <span class="nav-number">4.3.2</span> <span class="nav-text">To configure dedicated-admin privileges for an identity provider user</span> </a> </li> </ol> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#accessing-the-cluster"> <span class="nav-number">5</span> <span class="nav-text">Accessing the cluster</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#accessing-the-cluster-via-the-web-console"> <span class="nav-number">5.1</span> <span class="nav-text">Accessing the cluster via the Web Console</span> </a> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#accessing-the-cluster-via-the-oc-cli"> <span class="nav-number">5.2</span> <span class="nav-text">Accessing the cluster via the oc CLI</span> </a> </li> </ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#deleting-a-rosa-cluster"> <span class="nav-number">6</span> <span class="nav-text">Deleting a ROSA Cluster</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#automatic-scripts"> <span class="nav-number">7</span> <span class="nav-text">Automatic scripts</span> </a> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#references"> <span class="nav-number">8</span> <span class="nav-text">References</span> </a> </li>
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy;  2020 - 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo Liu</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
